@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FlexPad Lite</title>
+<style>
+  /* Deliberately hostile host-app CSS: none of this may leak into the document */
+  body { color: red; font-size: 40px; font-family: serif; }
+  p { color: red !important; margin: 5em !important; }
+  img { display: none !important; }
+  #p1 { outline: 10px solid lime; }
+</style>
+</head>
+<body>
+  <h1>Host app</h1>
+  <input type="file" id="pick" accept=".flex">
+  <flex-viewer id="v"></flex-viewer>
+  <script src="flex-viewer.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+    document.getElementById("pick").addEventListener("change", (e) => document.getElementById("v").load(e.target.files[0]));
+  </script>
+</body>
+</html>
