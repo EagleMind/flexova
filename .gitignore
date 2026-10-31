@@ -1,0 +1,20 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+python/build/
+
+# Prototype outputs (regenerate with the scripts in prototypes/)
+prototypes/flex/out/
+prototypes/flex/hostile/
+prototypes/**/*.png
+prototypes/poc/*.fdoc.html
+prototypes/poc/keyring.jwe.json
+prototypes/poc/org-private.jwk.json

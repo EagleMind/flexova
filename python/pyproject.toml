@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flexova"
+version = "0.0.0"
+description = "Write and validate Flexova (.flexova) documents using only the Python standard library."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["flexova", "document", "reflowable", "epub", "accessibility"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Text Processing :: Markup :: XML",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/flexova"]

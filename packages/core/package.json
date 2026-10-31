@@ -1,0 +1,28 @@
+{
+  "name": "@flexova/core",
+  "version": "0.0.0",
+  "description": "Read, write and validate Flexova (.flexova) documents. Runs in browsers, WebViews and Node.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "flexova",
+    "document",
+    "reflowable",
+    "epub",
+    "accessibility"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --target es2022",
+    "typecheck": "tsc --noEmit -p ."
+  }
+}
