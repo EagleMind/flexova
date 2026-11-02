@@ -1,0 +1,13 @@
+{
+  "title": "Aurora P2 Field Manual",
+  "language": "en",
+  "authors": ["Flexova Samples"],
+  "identifier": "urn:uuid:4f0c7a52-8a43-4c1e-9d55-2b8e1d0f0a01",
+  "modified": "2026-11-02T00:00:00Z",
+  "chapters": ["01-getting-started.md", "02-operation.md", "03-maintenance.md"],
+  "tokens": {
+    "color": {
+      "accent": { "light": "#0b5fff", "dark": "#7aa7ff" }
+    }
+  }
+}

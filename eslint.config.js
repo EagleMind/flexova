@@ -20,7 +20,11 @@ export default defineConfig(
   },
   {
     // ADR-0007/0008: core and viewer run in browsers, native WebViews and Node alike.
-    files: ["packages/core/src/**/*.ts", "packages/viewer/src/**/*.ts"],
+    files: [
+      "packages/core/src/**/*.ts",
+      "packages/viewer/src/**/*.ts",
+      "packages/import/src/**/*.ts",
+    ],
     ignores: ["**/*.test.ts"],
     rules: {
       "no-restricted-imports": [

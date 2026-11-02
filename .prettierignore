@@ -14,3 +14,6 @@ conformance/vectors/*.json
 python/src/flexova/_data
 packages/core/src/spec
 packages/viewer/src/allowlist.ts
+
+# Sample documents are test input; their exact Markdown is part of what is tested
+samples/**/*.md

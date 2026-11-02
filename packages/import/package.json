@@ -1,0 +1,37 @@
+{
+  "name": "@flexova/import",
+  "version": "0.0.0",
+  "description": "Convert Markdown and Pandoc documents (DOCX, ODT, HTML, LaTeX and more) into Flexova (.flexova) content.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "flexova",
+    "markdown",
+    "pandoc",
+    "docx",
+    "converter"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --target es2022",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@flexova/core": "workspace:*",
+    "mdast-util-from-markdown": "^2.1.0",
+    "mdast-util-gfm": "^3.1.0",
+    "micromark-extension-gfm": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4"
+  }
+}
