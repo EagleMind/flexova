@@ -16,7 +16,8 @@
     "maxTotalBytes": 536870912,
     "maxCompressionRatio": 200,
     "compressionRatioMinBytes": 1048576,
-    "maxNestingDepth": 64
+    "maxNestingDepth": 64,
+    "maxManifestDepth": 32
   },
   "entryNamePattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$",
   "mediaTypes": {

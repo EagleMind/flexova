@@ -210,6 +210,22 @@ def _reject_constant(name):
     raise ValueError(f"{name} is not valid JSON")
 
 
+def json_depth(value) -> int:
+    """Nesting depth of containers (a top-level object is depth 1), computed iteratively."""
+    deepest, stack = 0, [(value, 1)]
+    while stack:
+        node, depth = stack.pop()
+        if isinstance(node, dict):
+            children = node.values()
+        elif isinstance(node, list):
+            children = node
+        else:
+            continue
+        deepest = max(deepest, depth)
+        stack.extend((child, depth + 1) for child in children)
+    return deepest
+
+
 def check_manifest(entries: dict, c: Collector) -> None:
     raw = entries.get(MANIFEST_PATH)
     if raw is None:
@@ -217,8 +233,11 @@ def check_manifest(entries: dict, c: Collector) -> None:
         return
     try:
         doc = json.loads(raw.decode("utf-8"), parse_constant=_reject_constant)
-    except (UnicodeDecodeError, ValueError):
+    except (UnicodeDecodeError, ValueError, RecursionError):
         c.add("MAN_INVALID", MANIFEST_PATH, "not valid UTF-8 JSON")
+        return
+    if json_depth(doc) > PROFILE["limits"]["maxManifestDepth"]:
+        c.add("MAN_INVALID", MANIFEST_PATH, "nested too deeply")
         return
     if not isinstance(doc, dict):
         c.add("MAN_INVALID", MANIFEST_PATH, "must be a JSON object")

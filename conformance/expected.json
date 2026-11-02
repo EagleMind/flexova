@@ -410,6 +410,20 @@
       ],
       "description": "Light-mode text color fails 4.5:1 against the background."
     },
+    "invalid/manifest-too-deep.flexova": {
+      "valid": false,
+      "codes": [
+        "MAN_INVALID"
+      ],
+      "description": "flexova.json nests containers deeper than 32 levels."
+    },
+    "invalid/manifest-font-not-string.flexova": {
+      "valid": false,
+      "codes": [
+        "MAN_INVALID_TOKEN"
+      ],
+      "description": "A font token whose value is a list, not a name."
+    },
     "invalid/manifest-hash-mismatch.flexova": {
       "valid": false,
       "codes": [
@@ -811,6 +825,13 @@
         "MAN_INVALID_TOKEN"
       ],
       "description": "A color token that tries to inject CSS."
+    },
+    "hostile/manifest-depth-bomb.flexova": {
+      "valid": false,
+      "codes": [
+        "MAN_INVALID"
+      ],
+      "description": "flexova.json nested 50,000 levels deep (parser stack exhaustion)."
     },
     "hostile/sealed-level.flexova": {
       "valid": false,

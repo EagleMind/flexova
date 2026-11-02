@@ -43,7 +43,9 @@ def valid_color(name, value) -> bool:
 
 
 def valid_font(value) -> bool:
-    return isinstance(value, dict) and all(k in FONT_KEYS and value[k] in FONT_STACKS for k in value)
+    return isinstance(value, dict) and all(
+        k in FONT_KEYS and isinstance(value[k], str) and value[k] in FONT_STACKS for k in value
+    )
 
 
 def valid_measure(value) -> bool:

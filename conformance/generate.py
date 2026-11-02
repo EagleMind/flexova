@@ -590,6 +590,14 @@ def _(): return manifest_edit(lambda m: {**m, "tokens": {"measure": 300}})
 def _(): return set_token(fg={"light": "#aaaaaa", "dark": "#e8e6e3"}, bg={"light": "#ffffff", "dark": "#121212"})
 
 
+@fixture("invalid", "manifest-too-deep", ["MAN_INVALID"], "flexova.json nests containers deeper than 32 levels.")
+def _(): return manifest_edit(lambda m: {**m, "x-future": json.loads("[" * 40 + "]" * 40)})
+
+
+@fixture("invalid", "manifest-font-not-string", ["MAN_INVALID_TOKEN"], "A font token whose value is a list, not a name.")
+def _(): return manifest_edit(lambda m: {**m, "tokens": {"font": {"body": ["serif"]}}})
+
+
 @fixture("invalid", "manifest-hash-mismatch", ["MAN_HASH_MISMATCH"], "A listed SHA-256 is wrong.")
 def _():
     def edit(m):
@@ -841,6 +849,12 @@ def _(): return pkg().build(opts={CH: {"usize_delta": 300_000_000}})
 
 @fixture("hostile", "token-css-injection", ["MAN_INVALID_TOKEN"], "A color token that tries to inject CSS.")
 def _(): return set_token(accent={"light": "#000;}*{background:url(https://evil.example/)", "dark": "#7aa7ff"})
+
+
+@fixture("hostile", "manifest-depth-bomb", ["MAN_INVALID"], "flexova.json nested 50,000 levels deep (parser stack exhaustion).")
+def _():
+    deep = b"[" * 50000 + b"]" * 50000
+    return manifest_edit(lambda m: json.dumps({**m, "x-future": None}).encode().replace(b'"x-future": null', b'"x-future": ' + deep))
 
 
 @fixture("hostile", "sealed-level", ["MAN_UNSUPPORTED_LEVEL"], "A sealed (L1) package opened by a core validator.")
