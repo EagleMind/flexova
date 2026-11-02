@@ -1,0 +1,359 @@
+{
+  "$comment": "Flexova validation codes. Normative: every implementation reports exactly these codes (spec/flexova-1.0.md, section 8). Validation runs in phases, in this order. A code marked fatal stops validation once the phase that reported it finishes. Errors make a package invalid; warnings never do.",
+  "version": "1.0",
+  "phases": ["zip", "package", "manifest", "resources"],
+  "codes": {
+    "ZIP_NOT_ZIP": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "The file is not a ZIP archive, or its central directory is unreadable."
+    },
+    "ZIP_UNSUPPORTED_FEATURE": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "The archive uses an unsupported ZIP feature (ZIP64, multi-disk, or a compression method other than stored/deflate)."
+    },
+    "ZIP_ENCRYPTED_ENTRY": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "An entry uses ZIP-level encryption, which Flexova does not allow."
+    },
+    "ZIP_TOO_MANY_ENTRIES": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "The archive has more entries than the profile limit allows."
+    },
+    "ZIP_UNSAFE_PATH": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "An entry name is absolute, uses a backslash, or contains a '.' or '..' segment."
+    },
+    "ZIP_INVALID_NAME": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "An entry name contains characters outside [A-Za-z0-9._-/]."
+    },
+    "ZIP_DUPLICATE_ENTRY": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "Two entries have the same name, ignoring case."
+    },
+    "ZIP_SIZE_LIMIT": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "An entry, or the archive in total, exceeds the profile's uncompressed size limit."
+    },
+    "ZIP_RATIO_LIMIT": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "An entry's compression ratio exceeds the profile limit (possible zip bomb)."
+    },
+    "ZIP_MIMETYPE_NOT_FIRST": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "The first entry in the archive must be 'mimetype'."
+    },
+    "ZIP_MIMETYPE_COMPRESSED": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "The 'mimetype' entry must be stored uncompressed."
+    },
+    "ZIP_MIMETYPE_EXTRA_FIELD": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "The 'mimetype' entry must not have a ZIP extra field."
+    },
+    "ZIP_MIMETYPE_INVALID": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "The 'mimetype' entry must contain exactly 'application/epub+zip'."
+    },
+    "ZIP_CORRUPT": {
+      "phase": "zip",
+      "severity": "error",
+      "fatal": true,
+      "message": "An entry cannot be decompressed, or its size or CRC-32 does not match the archive directory."
+    },
+
+    "OCF_CONTAINER_MISSING": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": true,
+      "message": "META-INF/container.xml is missing."
+    },
+    "OCF_ROOTFILE_MISSING": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": true,
+      "message": "container.xml does not point to an existing package document."
+    },
+    "OPF_INVALID": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": true,
+      "message": "The package document is structurally invalid (wrong root, version, or malformed manifest items)."
+    },
+    "OPF_MISSING_METADATA": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "Required metadata is missing (dc:identifier, dc:title, dc:language or dcterms:modified)."
+    },
+    "OPF_INVALID_METADATA": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "Metadata has an invalid value (language tag or modification date)."
+    },
+    "OPF_PROFILE_MISSING": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "The package does not declare the Flexova profile (prefix and flexova:profile meta)."
+    },
+    "OPF_PROFILE_UNSUPPORTED": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "The declared Flexova profile version is not supported."
+    },
+    "OPF_A11Y_METADATA_MISSING": {
+      "phase": "package",
+      "severity": "warning",
+      "fatal": false,
+      "message": "Accessibility metadata is incomplete (schema:accessMode, accessModeSufficient, accessibilityFeature, accessibilityHazard, accessibilitySummary)."
+    },
+    "OPF_MISSING_RESOURCE": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "A manifest item points to a file that is not in the archive."
+    },
+    "OPF_UNDECLARED_RESOURCE": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "The archive contains a file that the package manifest does not declare."
+    },
+    "OPF_UNSUPPORTED_MEDIA_TYPE": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "A manifest item has a media type outside the profile's allowed list."
+    },
+    "OPF_NAV_MISSING": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "No manifest item has the 'nav' property."
+    },
+    "OPF_NAV_INVALID": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The navigation document has no <nav epub:type=\"toc\">."
+    },
+    "OPF_SPINE_INVALID": {
+      "phase": "package",
+      "severity": "error",
+      "fatal": false,
+      "message": "The spine is empty or references an unknown or non-XHTML item."
+    },
+
+    "MAN_MISSING": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": false,
+      "message": "META-INF/flexova.json is missing."
+    },
+    "MAN_INVALID": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": false,
+      "message": "META-INF/flexova.json is not valid JSON or does not match the manifest schema."
+    },
+    "MAN_UNSUPPORTED_VERSION": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": true,
+      "message": "The manifest declares an unsupported Flexova major version."
+    },
+    "MAN_UNSUPPORTED_LEVEL": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": true,
+      "message": "The package protection level is not supported by core Flexova (e.g. a sealed package)."
+    },
+    "MAN_INVALID_TOKEN": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": false,
+      "message": "A design token has an invalid name or value."
+    },
+    "MAN_LOW_CONTRAST": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": false,
+      "message": "A text color has a contrast ratio below 4.5:1 against the background in the light or dark theme."
+    },
+    "MAN_HASH_MISMATCH": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": false,
+      "message": "A listed entry is missing, or its size or SHA-256 does not match."
+    },
+    "MAN_ENTRIES_INCOMPLETE": {
+      "phase": "manifest",
+      "severity": "error",
+      "fatal": false,
+      "message": "The manifest's entry list omits files that are in the archive."
+    },
+
+    "XML_MALFORMED": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The file is not well-formed XML."
+    },
+    "XML_ENCODING": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The file is not UTF-8 encoded."
+    },
+    "XML_DTD_FORBIDDEN": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The file declares a DTD internal subset or entities, which are not allowed."
+    },
+    "XML_WRONG_NAMESPACE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The document's root element is not in the expected namespace."
+    },
+    "CSS_UNSAFE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "A stylesheet uses @import, remote url(), or script-like constructs."
+    },
+    "ASSET_SVG_UNSAFE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "An SVG image contains script, foreignObject, event handlers or external references."
+    },
+    "ASSET_TYPE_MISMATCH": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "An image's content does not match its declared media type."
+    },
+
+    "PRF_FORBIDDEN_ELEMENT": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The document uses an element that the profile forbids (for example script or iframe)."
+    },
+    "PRF_UNKNOWN_ELEMENT": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The document uses an element that the profile does not define."
+    },
+    "PRF_FORBIDDEN_ATTRIBUTE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "The document uses a forbidden attribute (event handler, style, or similar)."
+    },
+    "PRF_ATTRIBUTE_NOT_ALLOWED": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "An attribute is not allowed on this element."
+    },
+    "PRF_INVALID_VALUE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "An attribute value is not valid for its type."
+    },
+    "PRF_MISSING_ATTRIBUTE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "A required attribute is missing."
+    },
+    "PRF_MISSING_ALT": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "An image has no alt attribute (use alt=\"\" for decorative images)."
+    },
+    "PRF_CONTENT_MODEL": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "An element's children do not match its content model."
+    },
+    "PRF_DUPLICATE_ID": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "Two elements in the same document share an id."
+    },
+    "PRF_TOO_DEEP": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "Elements are nested deeper than the profile limit."
+    },
+    "PRF_REMOTE_RESOURCE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "A resource is loaded from outside the package; every resource must be embedded."
+    },
+    "PRF_BROKEN_REFERENCE": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "A resource reference points to a file that the package manifest does not declare."
+    },
+    "PRF_BROKEN_LINK": {
+      "phase": "resources",
+      "severity": "error",
+      "fatal": false,
+      "message": "An internal link points to a missing document or fragment."
+    },
+    "PRF_HEADING_SKIP": {
+      "phase": "resources",
+      "severity": "warning",
+      "fatal": false,
+      "message": "Heading levels skip a level (for example h1 followed by h3)."
+    },
+    "PRF_TABLE_NO_HEADERS": {
+      "phase": "resources",
+      "severity": "warning",
+      "fatal": false,
+      "message": "A table has no header cells (th)."
+    }
+  }
+}

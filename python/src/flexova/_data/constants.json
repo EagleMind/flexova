@@ -1,0 +1,12 @@
+{
+  "$comment": "Single source of truth for Flexova naming constants (ADR-0001, ADR-0008). Every implementation tests itself against this file. namespaceUri is a placeholder until the project domain is registered.",
+  "formatName": "Flexova",
+  "fileExtension": ".flexova",
+  "htmlExtension": ".flexova.html",
+  "mediaType": "application/vnd.flexova+zip",
+  "containerMimetype": "application/epub+zip",
+  "profileVersion": "1.0",
+  "namespaceUri": "https://flexova.example/ns/1.0#",
+  "manifestPath": "META-INF/flexova.json",
+  "viewerElement": "flexova-viewer"
+}

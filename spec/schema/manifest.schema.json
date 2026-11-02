@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flexova.example/schema/manifest-1.0.json",
+  "title": "Flexova package manifest (META-INF/flexova.json)",
+  "description": "Normative structure of the Flexova manifest. Reference implementations check these rules by hand and report MAN_* codes (spec/errors.json). Unknown top-level members and unknown token groups must be ignored, for forward compatibility.",
+  "type": "object",
+  "required": ["flexova", "level", "entries"],
+  "properties": {
+    "flexova": {
+      "description": "Format version as MAJOR.MINOR. Readers reject other major versions (MAN_UNSUPPORTED_VERSION).",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "level": {
+      "description": "Protection level (ADR-0004). Core Flexova supports only L0; L1 (Sealed) and L2 (Controlled) need extensions (MAN_UNSUPPORTED_LEVEL).",
+      "enum": ["L0", "L1", "L2"]
+    },
+    "tokens": { "$ref": "#/$defs/tokens" },
+    "entries": {
+      "description": "Every archive entry except 'mimetype', 'META-INF/flexova.json' and 'META-INF/flexova.sig.jws', each listed exactly once.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "size", "sha256"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "size": { "type": "integer", "minimum": 0 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "hexColor": { "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$" },
+    "tokens": {
+      "description": "Design tokens. Viewers compile them to CSS themselves; documents can never supply raw CSS.",
+      "type": "object",
+      "properties": {
+        "color": {
+          "description": "Named colors, each with a light and a dark value. fg, accent and muted must reach 4.5:1 contrast against bg in both themes (MAN_LOW_CONTRAST).",
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+          "additionalProperties": {
+            "type": "object",
+            "required": ["light", "dark"],
+            "properties": {
+              "light": { "$ref": "#/$defs/hexColor" },
+              "dark": { "$ref": "#/$defs/hexColor" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "font": {
+          "description": "Generic font stacks only, so no font files or names can be injected.",
+          "type": "object",
+          "properties": {
+            "body": { "$ref": "#/$defs/fontStack" },
+            "heading": { "$ref": "#/$defs/fontStack" },
+            "mono": { "$ref": "#/$defs/fontStack" }
+          },
+          "additionalProperties": false
+        },
+        "measure": {
+          "description": "Maximum line length in characters.",
+          "type": "integer",
+          "minimum": 40,
+          "maximum": 100
+        }
+      }
+    },
+    "fontStack": { "enum": ["system", "serif", "sans", "mono"] }
+  }
+}

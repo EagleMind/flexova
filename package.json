@@ -16,7 +16,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build && pnpm test:python"
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build && pnpm test:python",
+    "sync:spec": "node scripts/sync-spec.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",

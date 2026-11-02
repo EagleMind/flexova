@@ -1,0 +1,396 @@
+{
+  "$comment": "Flexova content profile 1.0. This file is normative: validators, viewers and the FlexPad editor schema are all derived from it. Prose: spec/flexova-1.0.md, section 5. Change it only together with conformance fixtures and every implementation (ADR-0008).",
+  "profile": "flexova-content",
+  "version": "1.0",
+  "namespaces": {
+    "xhtml": "http://www.w3.org/1999/xhtml",
+    "epub": "http://www.idpf.org/2007/ops",
+    "mathml": "http://www.w3.org/1998/Math/MathML",
+    "svg": "http://www.w3.org/2000/svg",
+    "xlink": "http://www.w3.org/1999/xlink",
+    "xml": "http://www.w3.org/XML/1998/namespace"
+  },
+  "limits": {
+    "maxEntries": 10000,
+    "maxEntryBytes": 268435456,
+    "maxTotalBytes": 536870912,
+    "maxCompressionRatio": 200,
+    "compressionRatioMinBytes": 1048576,
+    "maxNestingDepth": 64
+  },
+  "entryNamePattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$",
+  "mediaTypes": {
+    "application/xhtml+xml": "content",
+    "text/css": "style",
+    "image/png": "image",
+    "image/jpeg": "image",
+    "image/gif": "image",
+    "image/webp": "image",
+    "image/svg+xml": "image",
+    "audio/mp4": "audio",
+    "audio/mpeg": "audio"
+  },
+  "attributeTypes": {
+    "id": { "pattern": "^[A-Za-z_][A-Za-z0-9_.-]{0,255}$" },
+    "text": {},
+    "int": { "pattern": "^(0|[1-9][0-9]{0,5})$" },
+    "lang": { "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$" },
+    "tokens": { "pattern": "^[a-z][a-z0-9:-]*( [a-z][a-z0-9:-]*)*$" },
+    "datetime": {
+      "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?(Z|[+-][0-9]{2}:[0-9]{2})?)?)?)?$"
+    },
+    "boolean": { "kind": "boolean" },
+    "local-uri": { "kind": "local-uri" },
+    "link-uri": { "kind": "link-uri", "schemes": ["https", "http", "mailto"] }
+  },
+  "globalAttributes": {
+    "id": "id",
+    "lang": "lang",
+    "xml:lang": "lang",
+    "dir": { "enum": ["ltr", "rtl", "auto"] },
+    "epub:type": "tokens"
+  },
+  "forbiddenElements": [
+    "applet",
+    "base",
+    "button",
+    "canvas",
+    "dialog",
+    "embed",
+    "form",
+    "frame",
+    "frameset",
+    "iframe",
+    "input",
+    "noscript",
+    "object",
+    "option",
+    "portal",
+    "script",
+    "select",
+    "slot",
+    "style",
+    "svg",
+    "template",
+    "textarea",
+    "video"
+  ],
+  "forbiddenAttributePatterns": ["^on", "^style$", "^srcdoc$", "^formaction$", "^xlink:"],
+  "contentModels": {
+    "empty": "No child elements and no text.",
+    "text": "Text only; no child elements.",
+    "inline": "Text and elements whose category is inline.",
+    "blocks": "Only elements whose category is block; text other than XML whitespace is an error.",
+    "blocks-or-inline": "Either the inline model or the blocks model, but not a mixture of both.",
+    "children": "Only the listed elements, each within its [min, max] count (max null = unbounded); whitespace text only. Optional requireOneOf: at least one child from that list.",
+    "sequence": "Child elements in the listed order; each item names an element, any element of a list (anyOf) or a category, with min/max counts. Whitespace text only.",
+    "mathml": "Text and elements from the mathml section."
+  },
+  "elements": {
+    "html": {
+      "category": "root",
+      "content": {
+        "type": "sequence",
+        "items": [
+          { "element": "head", "min": 1, "max": 1 },
+          { "element": "body", "min": 1, "max": 1 }
+        ]
+      },
+      "required": ["lang"]
+    },
+    "head": {
+      "category": "structural",
+      "content": {
+        "type": "children",
+        "allowed": { "title": [1, 1], "meta": [0, 1], "link": [0, 1] }
+      }
+    },
+    "title": { "category": "structural", "content": { "type": "text" } },
+    "meta": {
+      "category": "structural",
+      "content": { "type": "empty" },
+      "attributes": { "charset": { "enum": ["utf-8", "UTF-8"] } },
+      "required": ["charset"]
+    },
+    "link": {
+      "category": "structural",
+      "content": { "type": "empty" },
+      "attributes": {
+        "rel": { "enum": ["stylesheet"] },
+        "href": "local-uri",
+        "type": { "enum": ["text/css"] }
+      },
+      "required": ["rel", "href"],
+      "targets": { "href": ["style"] }
+    },
+    "body": { "category": "structural", "content": { "type": "blocks" } },
+
+    "section": { "category": "block", "content": { "type": "blocks" } },
+    "nav": {
+      "category": "block",
+      "content": {
+        "type": "sequence",
+        "items": [
+          { "anyOf": ["h1", "h2", "h3", "h4", "h5", "h6"], "min": 0, "max": 1 },
+          { "element": "ol", "min": 1, "max": 1 }
+        ]
+      }
+    },
+    "h1": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },
+    "h2": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },
+    "h3": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },
+    "h4": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },
+    "h5": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },
+    "h6": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },
+    "p": { "category": "block", "content": { "type": "inline" } },
+    "blockquote": { "category": "block", "content": { "type": "blocks" } },
+    "aside": {
+      "category": "block",
+      "content": { "type": "blocks" },
+      "attributes": {
+        "role": { "enum": ["note"] },
+        "data-flexova-variant": { "enum": ["note", "tip", "important", "warning", "caution"] }
+      }
+    },
+    "ul": {
+      "category": "block",
+      "content": { "type": "children", "allowed": { "li": [1, null] } }
+    },
+    "ol": {
+      "category": "block",
+      "content": { "type": "children", "allowed": { "li": [1, null] } },
+      "attributes": { "start": "int", "reversed": "boolean" }
+    },
+    "li": { "category": "structural", "content": { "type": "blocks-or-inline" } },
+    "dl": {
+      "category": "block",
+      "content": { "type": "children", "allowed": { "dt": [1, null], "dd": [1, null] } }
+    },
+    "dt": { "category": "structural", "content": { "type": "inline" } },
+    "dd": { "category": "structural", "content": { "type": "blocks-or-inline" } },
+    "figure": {
+      "category": "block",
+      "content": {
+        "type": "children",
+        "allowed": {
+          "img": [0, null],
+          "picture": [0, null],
+          "table": [0, 1],
+          "pre": [0, 1],
+          "blockquote": [0, 1],
+          "audio": [0, 1],
+          "math": [0, 1],
+          "p": [0, null],
+          "figcaption": [0, 1]
+        },
+        "requireOneOf": ["img", "picture", "table", "pre", "blockquote", "audio", "math", "p"]
+      },
+      "required": ["id"]
+    },
+    "figcaption": { "category": "structural", "content": { "type": "blocks-or-inline" } },
+    "picture": {
+      "category": "inline",
+      "content": {
+        "type": "sequence",
+        "items": [
+          { "element": "source", "min": 0, "max": null },
+          { "element": "img", "min": 1, "max": 1 }
+        ]
+      }
+    },
+    "source": {
+      "category": "structural",
+      "content": { "type": "empty" },
+      "attributes": {
+        "srcset": "local-uri",
+        "media": {
+          "enum": ["(prefers-color-scheme: dark)", "(prefers-color-scheme: light)"]
+        },
+        "type": {
+          "enum": ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"]
+        }
+      },
+      "required": ["srcset", "media"],
+      "targets": { "srcset": ["image"] }
+    },
+    "img": {
+      "category": "inline",
+      "content": { "type": "empty" },
+      "attributes": { "src": "local-uri", "alt": "text", "width": "int", "height": "int" },
+      "required": ["src", "alt"],
+      "missingCodes": { "alt": "PRF_MISSING_ALT" },
+      "targets": { "src": ["image"] }
+    },
+    "audio": {
+      "category": "block",
+      "content": { "type": "inline" },
+      "attributes": { "src": "local-uri", "controls": "boolean" },
+      "required": ["src", "controls"],
+      "targets": { "src": ["audio"] }
+    },
+    "table": {
+      "category": "block",
+      "content": {
+        "type": "sequence",
+        "items": [
+          { "element": "caption", "min": 0, "max": 1 },
+          { "element": "thead", "min": 0, "max": 1 },
+          { "element": "tbody", "min": 1, "max": null },
+          { "element": "tfoot", "min": 0, "max": 1 }
+        ]
+      },
+      "required": ["id"]
+    },
+    "caption": { "category": "structural", "content": { "type": "inline" } },
+    "thead": {
+      "category": "structural",
+      "content": { "type": "children", "allowed": { "tr": [1, null] } }
+    },
+    "tbody": {
+      "category": "structural",
+      "content": { "type": "children", "allowed": { "tr": [1, null] } }
+    },
+    "tfoot": {
+      "category": "structural",
+      "content": { "type": "children", "allowed": { "tr": [1, null] } }
+    },
+    "tr": {
+      "category": "structural",
+      "content": {
+        "type": "children",
+        "allowed": { "th": [0, null], "td": [0, null] },
+        "requireOneOf": ["th", "td"]
+      }
+    },
+    "th": {
+      "category": "structural",
+      "content": { "type": "blocks-or-inline" },
+      "attributes": {
+        "scope": { "enum": ["col", "row", "colgroup", "rowgroup"] },
+        "colspan": "int",
+        "rowspan": "int"
+      }
+    },
+    "td": {
+      "category": "structural",
+      "content": { "type": "blocks-or-inline" },
+      "attributes": { "colspan": "int", "rowspan": "int" }
+    },
+    "pre": { "category": "block", "content": { "type": "inline" } },
+    "hr": { "category": "block", "content": { "type": "empty" } },
+    "details": {
+      "category": "block",
+      "content": {
+        "type": "sequence",
+        "items": [
+          { "element": "summary", "min": 1, "max": 1 },
+          { "category": "block", "min": 0, "max": null }
+        ]
+      }
+    },
+    "summary": { "category": "structural", "content": { "type": "inline" } },
+
+    "a": {
+      "category": "inline",
+      "content": { "type": "inline" },
+      "attributes": { "href": "link-uri" },
+      "required": ["href"],
+      "excludes": ["a"],
+      "mark": true
+    },
+    "abbr": {
+      "category": "inline",
+      "content": { "type": "inline" },
+      "attributes": { "title": "text" },
+      "mark": true
+    },
+    "br": { "category": "inline", "content": { "type": "empty" } },
+    "cite": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "code": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "dfn": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "em": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "kbd": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "mark": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "q": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "s": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "samp": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "small": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "span": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "strong": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "sub": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "sup": { "category": "inline", "content": { "type": "inline" }, "mark": true },
+    "time": {
+      "category": "inline",
+      "content": { "type": "inline" },
+      "attributes": { "datetime": "datetime" },
+      "mark": true
+    },
+    "var": { "category": "inline", "content": { "type": "inline" }, "mark": true }
+  },
+  "mathml": {
+    "root": "math",
+    "rootCategory": "inline",
+    "elements": [
+      "math",
+      "mi",
+      "mn",
+      "mo",
+      "ms",
+      "mtext",
+      "mspace",
+      "mrow",
+      "mfrac",
+      "msqrt",
+      "mroot",
+      "mstyle",
+      "merror",
+      "mpadded",
+      "mphantom",
+      "msub",
+      "msup",
+      "msubsup",
+      "munder",
+      "mover",
+      "munderover",
+      "mmultiscripts",
+      "mprescripts",
+      "mtable",
+      "mtr",
+      "mtd",
+      "semantics",
+      "annotation"
+    ],
+    "attributes": [
+      "accent",
+      "accentunder",
+      "alttext",
+      "columnalign",
+      "columnspan",
+      "depth",
+      "dir",
+      "display",
+      "displaystyle",
+      "encoding",
+      "fence",
+      "form",
+      "height",
+      "id",
+      "largeop",
+      "linethickness",
+      "lspace",
+      "mathvariant",
+      "maxsize",
+      "minsize",
+      "movablelimits",
+      "rowalign",
+      "rowspan",
+      "rspace",
+      "scriptlevel",
+      "separator",
+      "stretchy",
+      "symmetric",
+      "voffset",
+      "width"
+    ]
+  }
+}

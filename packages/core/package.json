@@ -24,5 +24,9 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --target es2022",
     "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "fflate": "^0.8.3",
+    "saxes": "^6.0.0"
   }
 }
