@@ -30,7 +30,9 @@ import { fromHtml, toHtml } from "@flexova/html";
 import type { Variant } from "@flexova/import";
 import { CONFIG_FILE, load, ToolError, UsageError } from "./sources.js";
 
-export const VERSION = "0.1.0";
+declare const __FLEXOVA_VERSION__: string | undefined;
+/** The package version, inlined at build time (tests run the source, which reports a dev version). */
+export const VERSION = typeof __FLEXOVA_VERSION__ === "string" ? __FLEXOVA_VERSION__ : "0.0.0-dev";
 
 export interface Io {
   out(text: string): void;

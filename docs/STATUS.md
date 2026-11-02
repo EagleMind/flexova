@@ -1,17 +1,21 @@
 # Status
 
-**Current milestone:** M2, Viewer + single-file HTML (in review, branch `m2-viewer`)
-**Next task:** M3.1, the `flexova` CLI (`new`, `build`, `check`, `pack --html`, `inspect`, `export --epub`, `sign`/`verify`)
+**Current milestone:** M3, CLI, importers, signing, first publish (in review, branch `m3-cli`)
+**Next task:** M4.1, the FlexPad web reader shell (private repo `EagleMind/flexpad`; needs the owner actions below)
 
 ## Owner actions (only the project owner can do these)
 
 - [x] Create the public GitHub repo `EagleMind/flexova` and give the Claude GitHub App access to it (done 2026-11-02; all milestone branches pushed)
 - [ ] Create the private repo `EagleMind/flexpad` before M4, and give the Claude GitHub App access to it
-- [ ] Open one PR per milestone branch, each targeting the previous one (`m0-bootstrap` → `main`, `m1-spec` → `m0-bootstrap`, `m2-viewer` → `m1-spec`), or ask a Claude session to open them
+- [ ] Open one PR per milestone branch, each targeting the previous one (`m0-bootstrap` → `main`, `m1-spec` → `m0-bootstrap`, `m2-viewer` → `m1-spec`, `m3-cli` → `m2-viewer`), or ask a Claude session to open them
 - [ ] Trademark search: FLEXOVA and FLEXPAD in USPTO, EUIPO and WIPO Global Brand Database, classes 9 and 42 (ask the attorney to compare against "Flexera")
 - [ ] Register a domain (flexova.com/.dev/.org), then replace the `namespaceUri` placeholder in `spec/constants.json`
 - [ ] Create the npm org `@flexova` and a PyPI account
-- [ ] Before M3: enable npm and PyPI trusted publishing for this repo's release workflow
+- [ ] Before the first release (when M3 is merged into `main`):
+  - npm: npm can only add a trusted publisher to a package that already exists. So after `npm login`, publish a `0.0.0` placeholder of each package from a clone of `main`: `pnpm install && pnpm build`, then in each `packages/<name>` folder run `pnpm pack` and `npm publish flexova-<name>-0.0.0.tgz --access public --tag placeholder`. Then, on npmjs.com, add the trusted publisher (repository `EagleMind/flexova`, workflow `release.yml`) to each of the five packages. The release workflow publishes 0.1.0 from then on.
+  - PyPI: add a pending trusted publisher for the project `flexova`: repository `EagleMind/flexova`, workflow `release.yml`, environment `pypi`. Create that environment in the repo's settings.
+  - GHCR: after the first image push, set the `flexova-cli` package's visibility to public.
+- [ ] Try `flexova build` on a real Word document from your field (the DOCX sample was made with Pandoc), and report anything that converts poorly
 - [ ] From M4: test on a real iPhone and Android device each milestone
 - [ ] Before M6: recruit 3 pilot organizations with field or technical manuals
 
@@ -40,8 +44,8 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 - [x] M1.4 `@flexova/core`: `validate()`, `write()` (deterministic), `compileTokens()`; runs in browsers (pure-JS SHA-256 fallback)
 - [x] M1.5 `python/flexova`: the same API, standard library only
 - [x] M1.6 CI `conformance.yml`: fixture freshness, epubcheck 5.2.1, Ace 1.4.6 (Ace verified locally: 0 violations)
-- [ ] epubcheck green in CI (it could not run in the build session; first run happens when the branch is pushed)
-- Done when: TS and Python agree on every fixture ✅, Ace reports 0 violations ✅, builds are byte-identical ✅, epubcheck reports 0 errors (pending CI).
+- [x] epubcheck green in CI (epubcheck 5.2.1 accepts `META-INF/flexova.json`)
+- Done when: TS and Python agree on every fixture ✅, Ace reports 0 violations ✅, builds are byte-identical ✅, epubcheck reports 0 errors ✅.
 
 ### M2: Viewer + single-file HTML (M) · in review
 
@@ -49,12 +53,28 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 - [x] M2.2 `@flexova/html`: static `.flexova.html` (no scripts, CSP with no network); reversible via `fromHtml()`
 - [x] M2.3 Playwright suite: 285 tests on Chromium (layout matrix, isolation, offline, every hostile fixture, JS-off static pages, axe WCAG 2.2 AA 0 violations, example)
 - [x] M2.4 `examples/` (plain HTML, React, Vue); `bench/` (1,000 pages); `e2e.yml` for Chromium, Firefox, WebKit
-- [ ] Firefox and WebKit green in CI (only Chromium is available in the build session)
+- [x] Chromium and Firefox green in CI. WebKit fixes are pushed: inflating no longer uses `Blob.stream()`, and `blob:` URLs are allowed in the request check. The last WebKit run was still in progress at hand-off.
 - [ ] Real-device check on an iPhone and an Android phone (owner, from M4; earlier is welcome)
 
-### M3: CLI, importers, signing, first publish (M)
+### M3: CLI, importers, signing, first publish (M) · in review
 
-`flexova` CLI (`new`, `build`, `check`, `pack --html`, `inspect`, `export --epub`, `sign`/`verify`), `@flexova/import` (Markdown, Pandoc), Docker image, and 0.1.0 releases to npm and PyPI.
+- [x] M3.1 Signatures (spec section 11 is normative):
+  - `spec/signature.json`: compact detached JWS over the manifest, alg `Ed25519`, six verification codes;
+  - 24 signature fixtures;
+  - `sign`/`verify` in `@flexova/core` (WebCrypto) and Python (pure RFC 8032), which produce byte-identical signature files.
+- [x] M3.2 `@flexova/import`: Markdown (CommonMark + GFM via mdast) and Pandoc JSON (DOCX, ODT, HTML, LaTeX…). Covers callouts from alerts and Word styles, endnotes, figures with captions, and cross-file links. Warnings, never silent loss.
+- [x] M3.3 `@flexova/cli` (`flexova`): `new`, `build`, `check`, `inspect`, `pack` (`--html` or a folder), `unpack`, `export --epub`, `keygen`, `sign`, `verify`. Builds are reproducible.
+- [x] M3.4 Release setup:
+  - Changesets, with `scripts/publish.mjs` (`pnpm pack` then `npm publish` via OIDC, with provenance);
+  - `release.yml` covers npm, PyPI and the GHCR Docker image;
+  - CI builds the Docker image and converts a DOCX with it;
+  - the sample Markdown manual and DOCX go through epubcheck and Ace in CI;
+  - ADR-0015.
+- [ ] First release: `@flexova/*` 0.1.0 and `flexova` 0.1.0 (Python). This needs the owner's npm and PyPI setup above, then the merge to `main`.
+- Done when:
+  - sample Markdown and DOCX convert to valid files ✅ (Ace 0 violations locally; epubcheck in CI);
+  - signatures verify and fail on tampering ✅;
+  - `npx @flexova/cli check` works from a clean machine: a clean install of the packed tarballs works ✅, and the registry install waits on the first release.
 
 ### M4–M6: FlexPad (private repo)
 
@@ -92,5 +112,5 @@ If GitHub rejects the push with "push declined due to email privacy restrictions
 
 ## Open questions
 
-- Does epubcheck accept `META-INF/flexova.json`? The first CI run of `conformance.yml` answers it. If not, move it to `OEBPS/flexova.json` with a superseding ADR.
 - Namespace URI waits on the domain (owner action).
+- TeX math from Pandoc sources stays TeX (shown as code) until a TeX→MathML step is added. Decide whether M5's editor needs it.

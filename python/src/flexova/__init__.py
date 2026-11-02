@@ -9,7 +9,7 @@ from ._tokens import compile_tokens
 from ._validate import validate
 from ._write import write
 
-__version__ = "0.0.0"
+__version__ = "0.1.0"
 
 FORMAT_NAME = "Flexova"
 FILE_EXTENSION = ".flexova"

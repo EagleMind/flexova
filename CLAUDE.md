@@ -10,26 +10,29 @@ Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document 
 
 ## Commands
 
-| Task                | Command                                                         |
-| ------------------- | --------------------------------------------------------------- |
-| Install             | `pnpm install`                                                  |
-| Everything CI runs  | `pnpm check`                                                    |
-| Lint / format       | `pnpm lint` · `pnpm format`                                     |
-| Typecheck           | `pnpm typecheck`                                                |
-| TS tests            | `pnpm test` (Vitest; every `packages/*` folder is a project)    |
-| Python tests        | `pnpm test:python` (stdlib `unittest`, `PYTHONPATH=python/src`) |
-| Build               | `pnpm build` (tsup → `packages/*/dist`)                         |
-| Sync spec copies    | `pnpm sync:spec` (after editing anything in `spec/*.json`)      |
-| Regenerate fixtures | `python3 conformance/generate.py` (`--check` in CI)             |
+| Task                | Command                                                                                      |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| Install             | `pnpm install`                                                                               |
+| Everything CI runs  | `pnpm check`                                                                                 |
+| Lint / format       | `pnpm lint` · `pnpm format`                                                                  |
+| Typecheck           | `pnpm typecheck`                                                                             |
+| TS tests            | `pnpm test` (Vitest; every `packages/*` folder is a project)                                 |
+| Python tests        | `pnpm test:python` (stdlib `unittest`, `PYTHONPATH=python/src`)                              |
+| Build               | `pnpm build` (tsup → `packages/*/dist`)                                                      |
+| Sync spec copies    | `pnpm sync:spec` (after editing anything in `spec/*.json`)                                   |
+| Regenerate fixtures | `python3 conformance/generate.py` (`--check` in CI)                                          |
+| Run the CLI         | `node packages/cli/dist/cli.js <command>` (after `pnpm build`)                               |
+| Release dry run     | `pnpm changeset status`; `node scripts/publish.mjs --dry-run` after `pnpm changeset version` |
 
 ## Layout
 
-- `spec/`: specification and **machine-readable rules** (`constants.json`; `profile/` and `schema/` from M1). CC-BY-4.0.
-- `conformance/`: `generate.py` (stdlib, never imports an implementation) writes `valid/`, `invalid/`, `hostile/` fixtures and `expected.json`; `vectors/` holds golden outputs; `external_checks.py` runs epubcheck and Ace.
+- `spec/`: specification and **machine-readable rules** (`constants.json`, `errors.json`, `signature.json`, `profile/`, `schema/`). CC-BY-4.0.
+- `conformance/`: `generate.py` (stdlib, never imports an implementation) writes `valid/`, `invalid/`, `hostile/` fixtures and `expected.json`, plus `signatures/` (its own `expected.json` and trusted `jwks.json`); `vectors/` holds golden outputs; `external_checks.py` runs epubcheck and Ace.
 - `packages/core`: `@flexova/core`, isomorphic read/write/validate.
 - `packages/viewer`: `<flexova-viewer>`; `src/render.ts` is the shared sanitizing rebuild core; `src/allowlist.ts` is generated.
 - `packages/html`: static, reversible `.flexova.html`.
-- `packages/{import,cli}` (M3) and `packages/seal` (M8).
+- `packages/import`: Markdown (mdast) and Pandoc-JSON importers, isomorphic. `packages/cli`: the `flexova` command (Node only). `packages/seal` arrives in M8.
+- `samples/`: a Markdown manual and a DOCX used by tests and by epubcheck/Ace in CI (their Markdown is not Prettier-formatted).
 - `e2e/`: Playwright specs, test server, hostile host page. `examples/`: plain HTML, React, Vue. `bench/`: 1,000-page benchmark.
 - `python/`: `flexova` on PyPI, **standard library only**.
 - `prototypes/`: design-phase experiments, reference only, not built or linted. Port from them; don't import them.
@@ -38,7 +41,7 @@ Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document 
 
 - **Rules are data (ADR-0008).** A new or changed format rule goes into `spec/*.json`, gets conformance fixtures, and is implemented in **both** TS and Python in the same PR.
 - **Constants** come from `spec/constants.json`. Tests in both languages enforce this.
-- **Isomorphic packages** (`core`, `viewer`) must not import `node:*` in `src/` (ESLint enforces this; tests may) and must never make network requests.
+- **Isomorphic packages** (`core`, `viewer`, `import`) must not import `node:*` in `src/` (ESLint enforces this; tests may) and must never make network requests.
 - **Security (ADR-0007):**
   - never put document markup into `innerHTML`; rebuild from the allowlist;
   - theme tokens are validated data, never raw CSS;

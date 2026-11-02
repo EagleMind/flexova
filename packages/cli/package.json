@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "description": "The flexova command: build Flexova (.flexova) documents from Markdown or DOCX, check, inspect, sign and verify them, and export static HTML or EPUB.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EagleMind/flexova.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/EagleMind/flexova#readme",
+  "bugs": "https://github.com/EagleMind/flexova/issues",
   "type": "module",
   "bin": {
     "flexova": "./dist/cli.js"
@@ -27,6 +34,10 @@
     "epub",
     "document"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit -p ."

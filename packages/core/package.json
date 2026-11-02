@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "description": "Read, write and validate Flexova (.flexova) documents. Runs in browsers, WebViews and Node.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EagleMind/flexova.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/EagleMind/flexova#readme",
+  "bugs": "https://github.com/EagleMind/flexova/issues",
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -21,6 +28,10 @@
     "epub",
     "accessibility"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --target es2022",
     "typecheck": "tsc --noEmit -p ."

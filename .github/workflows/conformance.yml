@@ -43,12 +43,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+      - run: sudo apt-get install -y --no-install-recommends pandoc
       - run: pnpm install --frozen-lockfile && pnpm build
       - name: Write one package with each implementation
         run: |
           mkdir -p build/samples
           node scripts/write-sample.mjs build/samples/typescript.flexova
           PYTHONPATH=python/src:python/tests python3 -c "import flexova, test_write; open('build/samples/python.flexova', 'wb').write(flexova.write(test_write.sample()))"
+      - name: Convert the sample Markdown manual and DOCX with the CLI (any warning fails)
+        run: |
+          node packages/cli/dist/cli.js build samples/markdown-manual --strict -o build/samples/cli-markdown.flexova
+          node packages/cli/dist/cli.js build samples/docx/field-guide.docx --lang en-GB --modified 2026-11-02T00:00:00Z --strict -o build/samples/cli-docx.flexova
       - uses: actions/upload-artifact@v4
         with:
           name: writer-samples
@@ -80,7 +85,7 @@ jobs:
         run: >
           python3 conformance/external_checks.py epubcheck
           --cmd "java -jar $RUNNER_TEMP/epubcheck-${EPUBCHECK_VERSION}/epubcheck.jar"
-          --also build/samples/typescript.flexova build/samples/python.flexova
+          --also build/samples/*.flexova
 
   ace:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
@@ -112,4 +117,4 @@ jobs:
         run: >
           python3 conformance/external_checks.py ace
           --cmd "node $RUNNER_TEMP/ace/node_modules/.bin/ace-puppeteer"
-          --also build/samples/typescript.flexova build/samples/python.flexova
+          --also build/samples/*.flexova

@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "description": "Convert Markdown and Pandoc documents (DOCX, ODT, HTML, LaTeX and more) into Flexova (.flexova) content.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EagleMind/flexova.git",
+    "directory": "packages/import"
+  },
+  "homepage": "https://github.com/EagleMind/flexova#readme",
+  "bugs": "https://github.com/EagleMind/flexova/issues",
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -21,6 +28,10 @@
     "docx",
     "converter"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --target es2022",
     "typecheck": "tsc --noEmit -p ."

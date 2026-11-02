@@ -12,7 +12,7 @@ Under the hood, an unencrypted Flexova file is also a valid **EPUB 3.3** package
 
 **FlexPad**, the offline-first reader and editor, is developed separately.
 
-> **Status: pre-alpha (milestone M2: viewer and single-file HTML).** The specification and reference implementations are being built in the open. See [`docs/STATUS.md`](docs/STATUS.md) for progress and [`docs/decisions/`](docs/decisions/) for the reasoning behind the design.
+> **Status: pre-alpha (milestone M3: CLI, importers and signatures; first npm and PyPI release pending).** The specification and reference implementations are being built in the open. See [`docs/STATUS.md`](docs/STATUS.md) for progress and [`docs/decisions/`](docs/decisions/) for the reasoning behind the design.
 
 ## Repository layout
 
@@ -23,13 +23,22 @@ Under the hood, an unencrypted Flexova file is also a valid **EPUB 3.3** package
 | `packages/core`   | `@flexova/core`: validate, write, read and compile tokens (TypeScript; Node and browsers).                        |
 | `packages/viewer` | `@flexova/viewer`: the `<flexova-viewer>` web component (about 7 KB gzipped, no dependencies).                    |
 | `packages/html`   | `@flexova/html`: static, script-free, reversible `.flexova.html` pages.                                           |
+| `packages/import` | `@flexova/import`: Markdown and Pandoc (DOCX, ODT, HTML, LaTeX…) importers.                                       |
+| `packages/cli`    | `@flexova/cli`: the `flexova` command (build, check, inspect, sign, verify, export).                              |
 | `python/`         | `flexova`: a standard-library-only Python writer and validator.                                                   |
 | `examples/`       | A plain-HTML reader, plus React and Vue components.                                                               |
+| `samples/`        | Sample sources: a Markdown manual and a DOCX quick reference (also checked by epubcheck and Ace in CI).           |
 | `e2e/`, `bench/`  | Browser tests (three engines in CI) and the 1,000-page benchmark.                                                 |
 | `docs/`           | Project status and architecture decision records (ADRs).                                                          |
 | `prototypes/`     | Design-phase experiments that proved the architecture (reference only).                                           |
 
-Planned next: `packages/import` and `packages/cli` (`flexova`).
+## Quick start
+
+```bash
+npx @flexova/cli build manual.md --html
+```
+
+This writes `manual.flexova` and a static `manual.flexova.html`. Run `npx @flexova/cli --help` for every command, including `check`, `sign` and `verify`. DOCX conversion needs [Pandoc](https://pandoc.org/installing.html), or the `ghcr.io/eaglemind/flexova-cli` Docker image. (Once 0.1.0 is published.)
 
 ## Development
 

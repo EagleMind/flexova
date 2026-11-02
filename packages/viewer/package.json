@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "description": "<flexova-viewer>: a dependency-free web component that displays Flexova (.flexova) documents safely, offline, in any framework.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EagleMind/flexova.git",
+    "directory": "packages/viewer"
+  },
+  "homepage": "https://github.com/EagleMind/flexova#readme",
+  "bugs": "https://github.com/EagleMind/flexova/issues",
   "type": "module",
   "sideEffects": [
     "./dist/index.js",
@@ -29,6 +36,10 @@
     "reflowable",
     "accessibility"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit -p .",
