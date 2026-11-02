@@ -13,7 +13,8 @@ export {
   type TrustedKeys,
   type Verification,
 } from "./sign.js";
-export { compileTokens, contrast, type Tokens } from "./tokens.js";
+export { compileTokens, contrast, CONTRAST_RULE, defaultColors, type Tokens } from "./tokens.js";
+export { PROFILE, type AttrSpec, type AttrType, type ElementDef, type Profile } from "./spec.js";
 export { validate } from "./validate.js";
 export { write, type Asset, type Chapter, type WriteInput } from "./write.js";
 export { parseXml, XmlElement, type XmlAttr } from "./xml.js";

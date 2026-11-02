@@ -24,6 +24,18 @@ const DEFAULT_COLORS: [string, string, string][] = [
 const TEXT_COLORS = ["fg", "accent", "muted"];
 const MIN_CONTRAST = 4.5;
 
+/** The colors viewers use when a document doesn't set them, by name. */
+export function defaultColors(): Record<string, { light: string; dark: string }> {
+  return Object.fromEntries(DEFAULT_COLORS.map(([name, light, dark]) => [name, { light, dark }]));
+}
+
+/** The contrast rule behind MAN_LOW_CONTRAST: each text color against the background, in both themes. */
+export const CONTRAST_RULE = {
+  background: "bg",
+  text: TEXT_COLORS,
+  minimum: MIN_CONTRAST,
+} as const;
+
 export interface Tokens {
   color?: Record<string, { light: string; dark: string }>;
   font?: { body?: string; heading?: string; mono?: string };

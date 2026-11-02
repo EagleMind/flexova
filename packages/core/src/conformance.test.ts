@@ -1,7 +1,14 @@
 // The shared conformance suite: this implementation must report exactly the expected codes per fixture.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { compileTokens, validate } from "./index.js";
+import {
+  compileTokens,
+  contrast,
+  CONTRAST_RULE,
+  defaultColors,
+  PROFILE,
+  validate,
+} from "./index.js";
 
 const root = new URL("../../../", import.meta.url);
 const suite = new URL("conformance/", root);
@@ -50,4 +57,24 @@ describe("bundled spec data", () => {
       ).toBe(readFileSync(new URL(source, root), "utf8"));
     },
   );
+});
+
+describe("exported profile and theme defaults", () => {
+  it("exports the bundled profile", () => {
+    expect(PROFILE.version).toBe("1.0");
+    expect(PROFILE.elements.p?.category).toBe("block");
+  });
+
+  it("default colors meet the contrast rule they are checked against", () => {
+    const colors = defaultColors();
+    const bg = colors[CONTRAST_RULE.background] as { light: string; dark: string };
+    for (const name of CONTRAST_RULE.text) {
+      for (const theme of ["light", "dark"] as const) {
+        const fg = colors[name]?.[theme] as string;
+        expect(contrast(fg, bg[theme]), `${name} ${theme}`).toBeGreaterThanOrEqual(
+          CONTRAST_RULE.minimum,
+        );
+      }
+    }
+  });
 });
