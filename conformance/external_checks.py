@@ -60,9 +60,17 @@ def main() -> None:
                 ok = run.returncode == 0 and not problems
             else:
                 out = Path(tmp) / (src.stem + "-ace")
-                run = subprocess.run(shlex.split(args.cmd) + ["-f", "-s", "-o", str(out), str(epub)], capture_output=True, text=True)
-                problems = ace_violations(out) if (out / "report.json").exists() else [run.stderr.strip()[-500:]]
+                # Ace drives a headless Chrome; its first launch on a fresh runner occasionally exits non-zero
+                # without a report. Retry once, and print Ace's own output if it still fails without violations.
+                for _attempt in range(2):
+                    shutil.rmtree(out, ignore_errors=True)
+                    run = subprocess.run(shlex.split(args.cmd) + ["-f", "-s", "-o", str(out), str(epub)], capture_output=True, text=True)
+                    problems = ace_violations(out) if (out / "report.json").exists() else []
+                    if run.returncode == 0 or problems:
+                        break
                 ok = run.returncode == 0 and not problems
+                if not ok and not problems:
+                    problems = [f"ace exited with status {run.returncode}:"] + (run.stdout + run.stderr).strip().splitlines()[-20:]
             print(("PASS " if ok else "FAIL ") + str(src.relative_to(HERE) if src.is_relative_to(HERE) else src))
             for line in problems:
                 print("    " + line)
