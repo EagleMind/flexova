@@ -196,6 +196,8 @@ test.describe("offline", () => {
       const v = document.getElementById("v") as HTMLElement & {
         load(b: Uint8Array): Promise<void>;
       };
+      let error: string | undefined;
+      v.addEventListener("flexova-error", (e) => (error = (e as CustomEvent).detail.code));
       await v.load(new Uint8Array(data));
       const imgs = [...(v.shadowRoot?.querySelectorAll("img") ?? [])];
       const decoded = await Promise.all(
@@ -207,11 +209,12 @@ test.describe("offline", () => {
         ),
       );
       return {
+        error,
         figures: v.shadowRoot?.querySelectorAll("figure").length,
         images: imgs.length > 0 && decoded.every(Boolean),
       };
     }, bytes);
-    expect(result).toEqual({ figures: 2, images: true });
+    expect(result).toEqual({ error: undefined, figures: 2, images: true });
     expect(problems).toEqual([]);
   });
 });

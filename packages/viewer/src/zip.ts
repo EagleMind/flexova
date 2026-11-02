@@ -68,8 +68,13 @@ export function unzip(data: Uint8Array): ReadEntry {
     if (e.method !== 8) return null;
     const out = new Uint8Array(e.usize);
     let size = 0;
-    const reader = new Blob([raw as Uint8Array<ArrayBuffer>])
-      .stream()
+    // An in-memory stream: Blob.stream() goes through the network process in WebKit.
+    const reader = new ReadableStream<Uint8Array>({
+      start(c) {
+        c.enqueue(raw);
+        c.close();
+      },
+    })
       .pipeThrough(new DecompressionStream("deflate-raw"))
       .getReader();
     try {
