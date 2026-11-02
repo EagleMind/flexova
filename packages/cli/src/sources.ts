@@ -2,7 +2,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { Tokens, WriteInput } from "@flexova/core";
 import { fromMarkdown, fromPandoc, type ImportResult, type Variant } from "@flexova/import";
 
@@ -12,6 +12,7 @@ export class ToolError extends Error {}
 export const CONFIG_FILE = "flexova.config.json";
 const MARKDOWN = new Set([".md", ".markdown", ".mdown", ".mkd"]);
 const VARIANTS = new Set(["note", "tip", "important", "warning", "caution"]);
+const EMBEDDED_MEDIA = new Set([".docx", ".odt", ".epub", ".ipynb"]);
 
 export interface ProjectConfig {
   title?: string;
@@ -128,13 +129,17 @@ function importPandoc(file: string, settings: BuildSettings, config: ProjectConf
     const ext = extname(file).toLowerCase();
     const from =
       ext === ".docx" ? ["-f", "docx+styles"] : ext === ".odt" ? ["-f", "odt+styles"] : [];
-    const run = spawnSync("pandoc", [...from, "-t", "json", `--extract-media=${media}`, file], {
+    // --sandbox: Pandoc reads only the input file, never other local files or URLs it references, so an
+    // untrusted document cannot pull private files or trigger network requests. Container formats carry
+    // their images inside, which --extract-media writes out; other formats keep relative image paths.
+    const extract = EMBEDDED_MEDIA.has(ext) ? [`--extract-media=${media}`] : [];
+    const run = spawnSync("pandoc", ["--sandbox", ...from, "-t", "json", ...extract, file], {
       encoding: "utf8",
       maxBuffer: 1 << 30,
     });
     if (run.error && (run.error as NodeJS.ErrnoException).code === "ENOENT") {
       throw new ToolError(
-        `Converting ${ext || "this file"} needs Pandoc 2.11 or later: https://pandoc.org/installing.html (or use the flexova Docker image)`,
+        `Converting ${ext || "this file"} needs Pandoc 2.15 or later: https://pandoc.org/installing.html (or use the flexova Docker image)`,
       );
     }
     if (run.status !== 0)
@@ -144,12 +149,12 @@ function importPandoc(file: string, settings: BuildSettings, config: ProjectConf
       ...pick(settings.language ?? config.language, "language"),
       ...pick(settings.authors ?? config.authors, "authors"),
       styleMap: { ...config.styleMap, ...settings.styleMap },
+      // Extracted media have absolute paths; images in HTML or LaTeX sources are relative to the source.
       readFile: (p) => {
-        const full = resolve(p);
-        return full.startsWith(resolve(media) + sep) ||
-          full.startsWith(resolve(dirname(file)) + sep)
-          ? readFileSync(full)
-          : undefined;
+        const full = isAbsolute(p) ? resolve(p) : resolve(dirname(file), p);
+        const inside = [media, dirname(file)].some((d) => full.startsWith(resolve(d) + sep));
+        if (!inside || !existsSync(full) || !statSync(full).isFile()) return undefined;
+        return readFileSync(full);
       },
     });
     return { result, config, fingerprint: readFileSync(file) };

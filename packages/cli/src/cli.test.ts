@@ -1,6 +1,14 @@
 // The CLI, run in-process through main() (plus one run of the built binary).
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pack, unpack, validate } from "@flexova/core";
@@ -123,6 +131,29 @@ describe("flexova", () => {
     expect(body).toContain('data-flexova-variant="important"');
     expect((await run("build", docx, "--style", "Nope")).code).toBe(EXIT.usage);
   });
+
+  it.skipIf(!hasPandoc)(
+    "reads only the source's own images when converting HTML (Pandoc sandbox)",
+    async () => {
+      mkdirSync(join(dir, "site/img"), { recursive: true });
+      copyFileSync(join(manual, "images/panel.png"), join(dir, "site/img/panel.png"));
+      copyFileSync(join(manual, "images/panel.png"), join(dir, "secret.png"));
+      writeFileSync(
+        join(dir, "site/page.html"),
+        '<html lang="en"><head><title>Page</title></head><body><h1>Page</h1>' +
+          '<p><img src="img/panel.png" alt="Panel"></p>' +
+          '<p><img src="../secret.png" alt="Escape"></p>' +
+          `<p><img src="${join(dir, "secret.png")}" alt="Absolute"></p>` +
+          '<p><img src="https://example.org/x.png" alt="Remote"></p></body></html>',
+      );
+      const r = await run("build", "site/page.html", "--lang", "en", "-o", "p.flexova");
+      expect(r.code, r.err).toBe(EXIT.ok);
+      expect(r.err).toContain("warning: Image not found: ../secret.png");
+      expect(r.err).toContain(`warning: Image not found: ${join(dir, "secret.png")}`);
+      expect(r.err).toContain("warning: Remote images are not allowed");
+      expect(JSON.parse((await run("inspect", "p.flexova", "--json")).out).assets).toHaveLength(1);
+    },
+  );
 
   it("reports invalid packages with codes, as text or JSON", async () => {
     const bad = join(root, "conformance/hostile/script-element.flexova");

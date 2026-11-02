@@ -31,7 +31,7 @@ npx @flexova/cli build manual --html
 
 **Reproducible builds:** the same input gives byte-identical output. When `flexova.config.json` has no `identifier`, one is derived from the input. The modification time comes from `--modified`, the config, or `SOURCE_DATE_EPOCH`.
 
-**Converting DOCX** needs [Pandoc](https://pandoc.org/installing.html) 2.11 or later. The `ghcr.io/eaglemind/flexova-cli` Docker image includes it. Word paragraph styles named Note, Tip, Important, Warning or Caution become callouts. Map others with `--style "Hinweis=note"`.
+**Converting DOCX** needs [Pandoc](https://pandoc.org/installing.html) 2.15 or later. The `ghcr.io/eaglemind/flexova-cli` Docker image includes it. Word paragraph styles named Note, Tip, Important, Warning or Caution become callouts. Map others with `--style "Hinweis=note"`.
 
 ## License
 
