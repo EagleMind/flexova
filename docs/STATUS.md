@@ -53,7 +53,7 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 - [x] M2.2 `@flexova/html`: static `.flexova.html` (no scripts, CSP with no network); reversible via `fromHtml()`
 - [x] M2.3 Playwright suite: 285 tests on Chromium (layout matrix, isolation, offline, every hostile fixture, JS-off static pages, axe WCAG 2.2 AA 0 violations, example)
 - [x] M2.4 `examples/` (plain HTML, React, Vue); `bench/` (1,000 pages); `e2e.yml` for Chromium, Firefox, WebKit
-- [x] Chromium and Firefox green in CI. WebKit fixes are pushed: inflating no longer uses `Blob.stream()`, and `blob:` URLs are allowed in the request check. The last WebKit run was still in progress at hand-off.
+- [x] Chromium, Firefox and WebKit green in CI, along with epubcheck and Ace. WebKit needed two fixes: inflating without `Blob.stream()`, and allowing `blob:` URLs in the request check.
 - [ ] Real-device check on an iPhone and an Android phone (owner, from M4; earlier is welcome)
 
 ### M3: CLI, importers, signing, first publish (M) · in review
@@ -72,7 +72,7 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
   - ADR-0015.
 - [ ] First release: `@flexova/*` 0.1.0 and `flexova` 0.1.0 (Python). This needs the owner's npm and PyPI setup above, then the merge to `main`.
 - Done when:
-  - sample Markdown and DOCX convert to valid files ✅ (Ace 0 violations locally; epubcheck in CI);
+  - sample Markdown and DOCX convert to valid files ✅ (epubcheck and Ace clean in CI; the Docker image converts the DOCX in CI);
   - signatures verify and fail on tampering ✅;
   - `npx @flexova/cli check` works from a clean machine: a clean install of the packed tarballs works ✅, and the registry install waits on the first release.
 
