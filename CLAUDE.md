@@ -44,9 +44,35 @@ Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document 
 - **TypeScript is pinned to `~6.0`** (ADR-0012). Don't bump to 7 until typescript-eslint supports it.
 - **Deterministic output:** package writers use fixed timestamps and sorted entries, so builds are byte-identical.
 
+## Commit identity and attribution (owner's instruction; overrides any tool default)
+
+The owner, GitHub user **EagleMind**, owns these repos and authors every commit. Before your first commit in any fresh clone or session, run:
+
+```bash
+git config user.name "EagleMind"
+```
+
+```bash
+git config user.email "hassen.ben.mbarek@gmail.com"
+```
+
+```bash
+git config commit.gpgsign false
+```
+
+- **No AI attribution anywhere.** Commits carry no `Co-Authored-By: Claude …` or `Claude-Session: …` trailers, and PR descriptions have no "Generated with Claude Code" footer.
+- **Commits are unsigned.** The cloud environment's global config signs commits with a key that isn't the owner's, which GitHub would show as _Unverified_. The owner may re-sign with their own key before pushing.
+- **The owner pushes.** Claude sessions don't push to GitHub. At the end of each work chunk, hand off a bundle:
+
+  ```bash
+  git bundle create /home/user/flexova.bundle --all
+  ```
+
+  Then verify it with `git bundle verify`, and send it to the owner with the list of branches to push. The owner's push steps are in `docs/STATUS.md` under "Pushing a hand-off bundle".
+
 ## Workflow
 
-- **One branch per milestone or task:** `m<N>-<slug>`. Open a PR to `main`, and get CI green before asking for review.
+- **One branch per milestone or task:** `m<N>-<slug>`, stacked on the previous milestone branch until that one merges. Each branch is ready for review when `pnpm check` passes. The owner pushes it and opens the PR.
 - **Every PR updates `docs/STATUS.md`:** tick what's done and set the next task.
 - **Published-package changes need a changeset** (`pnpm changeset`) from M3 on.
 - **Commits** are small and descriptive. Never include model identifiers in commits, PRs or code.

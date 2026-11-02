@@ -5,7 +5,7 @@
 
 ## Owner actions (only the project owner can do these)
 
-- [ ] Create GitHub repos `<owner>/flexova` (public) and `<owner>/flexpad` (private), and attach them to the Claude session
+- [ ] Create empty GitHub repos `EagleMind/flexova` (public) and `EagleMind/flexpad` (private), without a README, then push the hand-off bundle (see "Pushing a hand-off bundle" below)
 - [ ] Trademark search: FLEXOVA and FLEXPAD in USPTO, EUIPO and WIPO Global Brand Database, classes 9 and 42 (ask the attorney to compare against "Flexera")
 - [ ] Register a domain (flexova.com/.dev/.org), then replace the `namespaceUri` placeholder in `spec/constants.json`
 - [ ] Create the npm org `@flexova` and a PyPI account
@@ -26,7 +26,8 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 - [x] Licenses (Apache-2.0, CC-BY-4.0 for `spec/`), NOTICE, SECURITY.md, README
 - [x] CLAUDE.md, ADR-0001 to ADR-0012
 - [x] CI workflow (lint, format, typecheck, test, build, Python)
-- [ ] Pushed and CI green on GitHub (blocked on repo creation)
+- [x] Commit history authored by EagleMind, with no AI attribution (rules in CLAUDE.md)
+- [ ] Pushed by the owner, and CI green on GitHub
 
 ### M1: Spec v0.1, conformance, reference implementations (M)
 
@@ -53,6 +54,28 @@ Web reader (M4), editor (M5), pilot release (M6).
 ### Later
 
 M7 native wrappers · M8 Flexova Seal · M9 server, collaboration, Rust core if needed.
+
+## Pushing a hand-off bundle
+
+Claude sessions don't push. At the end of each work chunk you receive `flexova.bundle` (every branch), with the list of branches to push. From the folder holding the bundle:
+
+```bash
+git clone --bare flexova.bundle flexova-handoff.git
+```
+
+```bash
+cd flexova-handoff.git
+```
+
+```bash
+git push https://github.com/EagleMind/flexova.git main m0-bootstrap
+```
+
+Replace the branch names with the ones listed in the hand-off message. A bare clone keeps every branch, so you can push any of them. The push is never forced: if GitHub already has newer commits on a branch (for example `main` after a merged PR), that branch is skipped with an error and nothing is lost. For day-to-day work, use a normal clone from GitHub.
+
+Then open one PR per milestone branch on GitHub. Branches are stacked (`m1-…` is based on `m0-bootstrap`), so point each PR at the previous milestone branch until that one merges.
+
+If GitHub rejects the push with "push declined due to email privacy restrictions", either turn off _Block command line pushes that expose my email_ (GitHub → Settings → Emails), or send your `@users.noreply.github.com` address so the history can be rewritten to use it.
 
 ## Open questions
 
