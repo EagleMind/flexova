@@ -19,3 +19,5 @@ prototypes/poc/*.fdoc.html
 prototypes/poc/keyring.jwe.json
 prototypes/poc/org-private.jwk.json
 build/
+test-results/
+playwright-report/
