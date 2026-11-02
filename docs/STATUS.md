@@ -1,7 +1,7 @@
 # Status
 
-**Current milestone:** M1, Spec v0.1 + conformance + reference implementations (in review, branch `m1-spec`)
-**Next task:** M2.1, port `prototypes/flex/web/flex-viewer.js` to `packages/viewer` (`<flexova-viewer>`), generating its allowlist from the profile
+**Current milestone:** M2, Viewer + single-file HTML (in review, branch `m2-viewer`)
+**Next task:** M3.1, the `flexova` CLI (`new`, `build`, `check`, `pack --html`, `inspect`, `export --epub`, `sign`/`verify`)
 
 ## Owner actions (only the project owner can do these)
 
@@ -40,9 +40,14 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 - [ ] epubcheck green in CI (it could not run in the build session; first run happens when the branch is pushed)
 - Done when: TS and Python agree on every fixture ✅, Ace reports 0 violations ✅, builds are byte-identical ✅, epubcheck reports 0 errors (pending CI).
 
-### M2: Viewer + single-file HTML (M)
+### M2: Viewer + single-file HTML (M) · in review
 
-`@flexova/viewer` (port `prototypes/flex/web/flex-viewer.js`, ≤ 6 KB gzipped), `@flexova/html` (static-first), examples, and Playwright on 3 engines × 4 widths × 2 themes, plus isolation, offline and attack suites.
+- [x] M2.1 `@flexova/viewer`: `<flexova-viewer>` (7.2 KB gzipped, budget 8 KB per ADR-0014); allowlist generated from the profile; shared `./render` core
+- [x] M2.2 `@flexova/html`: static `.flexova.html` (no scripts, CSP with no network); reversible via `fromHtml()`
+- [x] M2.3 Playwright suite: 285 tests on Chromium (layout matrix, isolation, offline, every hostile fixture, JS-off static pages, axe WCAG 2.2 AA 0 violations, example)
+- [x] M2.4 `examples/` (plain HTML, React, Vue); `bench/` (1,000 pages); `e2e.yml` for Chromium, Firefox, WebKit
+- [ ] Firefox and WebKit green in CI (only Chromium is available in the build session)
+- [ ] Real-device check on an iPhone and an Android phone (owner, from M4; earlier is welcome)
 
 ### M3: CLI, importers, signing, first publish (M)
 

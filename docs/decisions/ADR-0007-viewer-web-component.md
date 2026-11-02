@@ -1,6 +1,6 @@
 # ADR-0007: The viewer is a dependency-free web component
 
-- **Status:** Accepted, 2026-10-31.
+- **Status:** Accepted, 2026-10-31. The size budget is superseded by ADR-0014 (8 KB).
 
 ## Decision
 

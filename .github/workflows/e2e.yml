@@ -1,0 +1,45 @@
+name: Browsers
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: E2E (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Install ${{ matrix.project }} (version pinned by @playwright/test)
+        run: pnpm exec playwright install --with-deps ${{ matrix.project }}
+      - run: pnpm e2e --project=${{ matrix.project }}
+      - name: Benchmark (1,000 pages)
+        if: matrix.project == 'chromium'
+        run: pnpm bench
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-${{ matrix.project }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7

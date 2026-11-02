@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flexova reader (plain HTML example)</title>
+    <!-- One script, no build step. In your app: npm install @flexova/viewer, or copy dist/flexova-viewer.min.js. -->
+    <script src="../../packages/viewer/dist/flexova-viewer.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #ddd;
+      }
+      header h1 {
+        font-size: 1rem;
+        margin: 0 auto 0 0;
+      }
+      #toc ol {
+        margin: 0;
+        padding: 0.5rem 1rem 0.5rem 2rem;
+      }
+      #drop {
+        min-height: 60vh;
+      }
+      #drop.dragging {
+        outline: 3px dashed #0b5fff;
+        outline-offset: -6px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 id="title">Open a .flexova document</h1>
+      <label>
+        Document
+        <input id="file" type="file" accept=".flexova,application/vnd.flexova+zip" />
+      </label>
+      <label>
+        Theme
+        <select id="theme">
+          <option value="auto">Automatic</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </header>
+    <nav id="toc" aria-label="Contents" hidden></nav>
+    <main id="drop">
+      <flexova-viewer id="viewer"></flexova-viewer>
+    </main>
+    <script>
+      const viewer = document.getElementById("viewer");
+      const drop = document.getElementById("drop");
+
+      // Load from a file picker or drag-and-drop; works offline because nothing is fetched.
+      document.getElementById("file").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) viewer.load(file);
+      });
+      drop.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        drop.classList.add("dragging");
+      });
+      drop.addEventListener("dragleave", () => drop.classList.remove("dragging"));
+      drop.addEventListener("drop", (e) => {
+        e.preventDefault();
+        drop.classList.remove("dragging");
+        const file = e.dataTransfer.files[0];
+        if (file) viewer.load(file);
+      });
+
+      document.getElementById("theme").addEventListener("change", (e) => {
+        if (e.target.value === "auto") viewer.removeAttribute("theme");
+        else viewer.setAttribute("theme", e.target.value);
+      });
+
+      // Build a table of contents from the viewer's metadata.
+      viewer.addEventListener("flexova-load", (e) => {
+        const { title, toc } = e.detail;
+        document.getElementById("title").textContent = title || "Untitled document";
+        document.title = title || "Flexova reader";
+        const nav = document.getElementById("toc");
+        const list = document.createElement("ol");
+        for (const entry of toc) {
+          const item = document.createElement("li");
+          const button = document.createElement("a");
+          button.href = entry.href;
+          button.textContent = entry.label;
+          button.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            viewer.goTo(entry.href);
+          });
+          item.append(button);
+          list.append(item);
+        }
+        nav.replaceChildren(list);
+        nav.hidden = toc.length === 0;
+      });
+      viewer.addEventListener("flexova-error", (e) => {
+        document.getElementById("title").textContent = e.detail.message;
+        document.getElementById("toc").hidden = true;
+      });
+    </script>
+  </body>
+</html>

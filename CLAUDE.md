@@ -27,7 +27,10 @@ Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document 
 - `spec/`: specification and **machine-readable rules** (`constants.json`; `profile/` and `schema/` from M1). CC-BY-4.0.
 - `conformance/`: `generate.py` (stdlib, never imports an implementation) writes `valid/`, `invalid/`, `hostile/` fixtures and `expected.json`; `vectors/` holds golden outputs; `external_checks.py` runs epubcheck and Ace.
 - `packages/core`: `@flexova/core`, isomorphic read/write/validate.
-- `packages/{viewer,html,import,cli}` (M2–M3) and `packages/seal` (M8).
+- `packages/viewer`: `<flexova-viewer>`; `src/render.ts` is the shared sanitizing rebuild core; `src/allowlist.ts` is generated.
+- `packages/html`: static, reversible `.flexova.html`.
+- `packages/{import,cli}` (M3) and `packages/seal` (M8).
+- `e2e/`: Playwright specs, test server, hostile host page. `examples/`: plain HTML, React, Vue. `bench/`: 1,000-page benchmark.
 - `python/`: `flexova` on PyPI, **standard library only**.
 - `prototypes/`: design-phase experiments, reference only, not built or linted. Port from them; don't import them.
 
@@ -45,6 +48,8 @@ Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document 
 - **Python stays dependency-free:** `dependencies = []`, tests with `unittest`.
 - **TypeScript is pinned to `~6.0`** (ADR-0012). Don't bump to 7 until typescript-eslint supports it.
 - **Deterministic output:** package writers use fixed timestamps and sorted entries, so builds are byte-identical.
+- **Build before typecheck/test:** workspace packages import each other's `dist/`, so run `pnpm build` first (CI does).
+- **Generated files are never hand-edited or Prettier-formatted:** fixtures, `expected.json`, vectors, synced spec copies, the viewer allowlist.
 
 ## Commit identity and attribution (owner's instruction; overrides any tool default)
 

@@ -6,7 +6,7 @@ import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url)).replace(/[\\/]+$/, "");
-const allowed = ["e2e/www/", "conformance/", "packages/viewer/dist/", "build/e2e/"];
+const allowed = ["e2e/www/", "examples/", "conformance/", "packages/viewer/dist/", "build/e2e/"];
 const types = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",

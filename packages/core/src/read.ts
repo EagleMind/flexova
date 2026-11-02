@@ -63,6 +63,17 @@ export async function read(input: Uint8Array | ArrayBuffer): Promise<FlexovaPack
 }
 
 /**
+ * Safely unpack a ZIP produced by pack() (or any Flexova-shaped ZIP) into its entries, enforcing every
+ * ZIP-phase rule of the spec (limits, names, mimetype first). Throws FlexovaError if any rule fails.
+ */
+export function unpack(input: Uint8Array): Map<string, Uint8Array> {
+  const c = new Collector();
+  const entries = readZip(new Uint8Array(input.buffer, input.byteOffset, input.byteLength), c);
+  if (!entries) throw new FlexovaError(c.report());
+  return entries;
+}
+
+/**
  * Deterministically re-pack entries into a ZIP: `mimetype` first and stored, every other entry deflated in
  * code-point order of name. Does not validate; pass the result to validate() if needed.
  */

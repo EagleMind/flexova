@@ -1,7 +1,15 @@
 // @flexova/html: render a Flexova package as one self-contained, static .flexova.html file (ADR-0006).
 // The page needs no JavaScript, cannot load anything from the network (CSP), and embeds every entry of the
 // original package so a trusted reader can extract it again byte for byte (fromHtml).
-import { compileTokens, pack, parseXml, read, sha256, type XmlElement } from "@flexova/core";
+import {
+  compileTokens,
+  pack,
+  parseXml,
+  read,
+  sha256,
+  unpack,
+  type XmlElement,
+} from "@flexova/core";
 import {
   MEDIA_KINDS,
   XHTML,
@@ -24,6 +32,8 @@ export interface ToHtmlResult {
 const PACKAGE_SCRIPT_TYPE = "application/vnd.flexova.package+json";
 const VOID = new Set(["img", "br", "hr", "source"]);
 const RENDITION_CSS =
+  // Off-screen chapters skip layout until scrolled near, which keeps very long documents fast.
+  "main>.fx-doc{content-visibility:auto;contain-intrinsic-size:auto 1500px}" +
   "main>.fx-doc+.fx-doc{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--flexova-surface)}" +
   ".fx-scroll{overflow-x:auto;max-width:100%}math[display=block]{overflow-x:auto;max-width:100%}" +
   "audio{max-width:100%}:target{scroll-margin-top:1rem}\n";
@@ -148,15 +158,13 @@ export async function toHtml(
     main.kids.push(renderDoc(pkg.navPath, "d0", " fx-nav"));
   pkg.spine.forEach((path, i) => main.kids.push(renderDoc(path, `d${i + 1}`)));
 
-  const embedded: Record<string, string> = {};
-  for (const [name, bytes] of [...pkg.entries].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
-    if (!tagged.has(name)) embedded[name] = toBase64(bytes);
-  }
+  // Entries not recoverable from the page's data: URIs travel as one compressed ZIP (inert JSON, never executed).
+  const rest = new Map([...pkg.entries].filter(([name]) => !tagged.has(name)));
   const packageJson = JSON.stringify({
     format: "flexova-html",
     version: 1,
     names: [...pkg.entries.keys()].sort(),
-    entries: embedded,
+    zip: toBase64(pack(rest)),
   }).replace(/</g, "\\u003c");
 
   const css = compileTokens(pkg.tokens) + RENDITION_CSS;
@@ -195,12 +203,11 @@ export function fromHtml(html: string): Uint8Array {
     format: string;
     version: number;
     names: string[];
-    entries: Record<string, string>;
+    zip: string;
   };
   if (data.format !== "flexova-html" || data.version !== 1)
     throw new Error("Unsupported embedded package format.");
-  const entries = new Map<string, Uint8Array>();
-  for (const [name, b64] of Object.entries(data.entries)) entries.set(name, fromBase64(b64));
+  const entries = unpack(fromBase64(data.zip));
   for (const tag of html.matchAll(/<(?:img|source|audio)\b[^>]*>/g)) {
     const attrs = Object.fromEntries(
       [...tag[0].matchAll(/([a-z-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]),

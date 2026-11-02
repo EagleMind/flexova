@@ -76,6 +76,7 @@ export function viewerCss(tokens: unknown): string {
     `:host([theme=dark]) ${dim}` +
     ".fx{box-sizing:border-box;max-width:var(--flexova-measure);margin:0 auto;padding:1rem;color:var(--flexova-fg);" +
     "font-family:var(--flexova-font-body);font-size:1.0625rem;line-height:1.6;overflow-wrap:break-word}" +
+    ".fx-doc{content-visibility:auto;contain-intrinsic-size:auto 1500px}" +
     ".fx-doc+.fx-doc{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--flexova-surface)}" +
     "h1,h2,h3,h4,h5,h6{font-family:var(--flexova-font-heading);line-height:1.25}" +
     "a{color:var(--flexova-accent)}img{max-width:100%;height:auto}figure{margin-inline:0}" +
