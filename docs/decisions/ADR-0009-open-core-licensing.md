@@ -1,6 +1,6 @@
 # ADR-0009: Open-core licensing and repository split
 
-- **Status:** Accepted, 2026-10-31 (product owner decision).
+- **Status:** Accepted, 2026-10-31 (product owner decision). The FlexPad part is **superseded by [ADR-0016](ADR-0016-flexpad-agpl-public.md)**: FlexPad is AGPL-3.0 in a public repository.
 
 ## Decision
 

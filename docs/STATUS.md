@@ -1,13 +1,13 @@
 # Status
 
-**Current milestone:** M3, CLI, importers, signing, first publish (in review, branch `m3-cli`)
-**Next task:** M4.1, the FlexPad web reader shell (private repo `EagleMind/flexpad`; needs the owner actions below)
+**Current milestone:** M4, FlexPad web reader (in review: `m4-reader` in `EagleMind/flexpad`, and the hooks it needed on `m4-reader-hooks` here)
+**Next task:** M5.1, the FlexPad editor (in the flexpad repo). Here: the first 0.1.0 release once the owner's npm/PyPI setup is done.
 
 ## Owner actions (only the project owner can do these)
 
 - [x] Create the public GitHub repo `EagleMind/flexova` and give the Claude GitHub App access to it (done 2026-11-02; all milestone branches pushed)
-- [ ] Create the private repo `EagleMind/flexpad` before M4, and give the Claude GitHub App access to it
-- [ ] Open one PR per milestone branch, each targeting the previous one (`m0-bootstrap` → `main`, `m1-spec` → `m0-bootstrap`, `m2-viewer` → `m1-spec`, `m3-cli` → `m2-viewer`), or ask a Claude session to open them
+- [x] Create the repo `EagleMind/flexpad` (public, AGPL-3.0 per ADR-0016) and give the Claude GitHub App access to it
+- [ ] Open one PR per milestone branch, each targeting the previous one (`m0-bootstrap` → `main`, `m1-spec` → `m0-bootstrap`, `m2-viewer` → `m1-spec`, `m3-cli` → `m2-viewer`, `m4-reader-hooks` → `m3-cli`), or ask a Claude session to open them
 - [ ] Trademark search: FLEXOVA and FLEXPAD in USPTO, EUIPO and WIPO Global Brand Database, classes 9 and 42 (ask the attorney to compare against "Flexera")
 - [ ] Register a domain (flexova.com/.dev/.org), then replace the `namespaceUri` placeholder in `spec/constants.json`
 - [ ] Create the npm org `@flexova` and a PyPI account
@@ -76,9 +76,9 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
   - signatures verify and fail on tampering ✅;
   - `npx @flexova/cli check` works from a clean machine: a clean install of the packed tarballs works ✅, and the registry install waits on the first release.
 
-### M4–M6: FlexPad (private repo)
+### M4–M6: FlexPad (public repo, AGPL-3.0)
 
-M4 (the web reader) is in progress in the private `EagleMind/flexpad` repo, which tracks its own status. Hooks it needed from this repo are on branch `m4-reader-hooks`: `read()` metadata, the viewer's `--flexova-font-scale`, and print rendering.
+M4 (the web reader) is built and in review in the `EagleMind/flexpad` repo, which tracks its own status. Hooks it needed from this repo are on branch `m4-reader-hooks`: `read()` metadata, the viewer's `--flexova-font-scale`, and print rendering.
 
 Web reader (M4), editor (M5), pilot release (M6).
 

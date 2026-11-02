@@ -19,3 +19,4 @@ Each ADR records one decision: its context, what was decided, the consequences, 
 | [0013](ADR-0013-validation-rules-from-m1.md)            | Validation rules decided in M1: code sets, trailing deflate bytes, JSON depth, no DTDs, ASCII names, DPUB roles, SHA-256 fallback         |
 | [0014](ADR-0014-renderers-from-m2.md)                   | Rendering decisions from M2: viewer budget 8 KB (supersedes ADR-0007's 6 KB), shared rebuild core, id namespacing, reversible static HTML |
 | [0015](ADR-0015-m3-signatures-importers-cli-release.md) | M3: signature format (compact detached JWS, alg Ed25519), mdast and Pandoc-JSON importers, reproducible CLI builds, OIDC releases         |
+| [0016](ADR-0016-flexpad-agpl-public.md)                 | FlexPad is AGPL-3.0 in a public repository (supersedes ADR-0009's proprietary FlexPad)                                                    |

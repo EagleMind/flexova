@@ -1,6 +1,6 @@
 # Flexova: guide for Claude sessions
 
-Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document format: strict XHTML inside an EPUB 3.3 container. This repo holds the spec, the conformance suite and the open-source SDKs. **FlexPad**, the proprietary reader and editor, lives in a separate private repo and consumes the published `@flexova/*` packages.
+Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document format: strict XHTML inside an EPUB 3.3 container. This repo holds the spec, the conformance suite and the open-source SDKs. **FlexPad**, the reader and editor, lives in the separate public repo `EagleMind/flexpad` under AGPL-3.0 (ADR-0016) and consumes the `@flexova/*` packages. Never copy FlexPad code into this Apache-2.0 repo.
 
 ## Start every session here
 

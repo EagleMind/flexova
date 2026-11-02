@@ -10,7 +10,7 @@
 
 Under the hood, an unencrypted Flexova file is also a valid **EPUB 3.3** package. Encryption is an optional extension (_Flexova Seal_), not part of the core format.
 
-**FlexPad**, the offline-first reader and editor, is developed separately.
+**[FlexPad](https://github.com/EagleMind/flexpad)**, the offline-first reader and editor, is developed separately under the AGPL-3.0.
 
 > **Status: pre-alpha (milestone M3: CLI, importers and signatures; first npm and PyPI release pending).** The specification and reference implementations are being built in the open. See [`docs/STATUS.md`](docs/STATUS.md) for progress and [`docs/decisions/`](docs/decisions/) for the reasoning behind the design.
 
