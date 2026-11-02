@@ -15,11 +15,9 @@ test.describe("readable with JavaScript disabled", () => {
         "console",
         (m) => /Content.Security.Policy|Refused/i.test(m.text()) && blocked.push(m.text()),
       );
-      page.on(
-        "request",
-        (r) =>
-          !r.url().startsWith("file:") && !r.url().startsWith("data:") && blocked.push(r.url()),
-      );
+      // file:, data: and blob: never leave the device. WebKit plays inline data: audio through blob: URLs
+      // it creates itself, so only other schemes count as requests.
+      page.on("request", (r) => !/^(file|data|blob):/.test(r.url()) && blocked.push(r.url()));
       await page.setViewportSize({ width: 320, height: 640 });
       await page.goto(fileUrl(rel));
       await expect(page.locator("main")).not.toBeEmpty();
