@@ -69,13 +69,13 @@ git config commit.gpgsign false
 
 - **No AI attribution anywhere.** Commits carry no `Co-Authored-By: Claude …` or `Claude-Session: …` trailers, and PR descriptions have no "Generated with Claude Code" footer.
 - **Commits are unsigned.** The cloud environment's global config signs commits with a key that isn't the owner's, which GitHub would show as _Unverified_. The owner may re-sign with their own key before pushing.
-- **The owner pushes.** Claude sessions don't push to GitHub. At the end of each work chunk, hand off a bundle:
+- **Pushing:** the remote is `origin` (https://github.com/EagleMind/flexova). Push milestone branches only when the owner asks, never with `--force` and never to `main` (it changes through reviewed PRs). If a session can't push, hand off a bundle instead:
 
   ```bash
   git bundle create /home/user/flexova.bundle --all
   ```
 
-  Then verify it with `git bundle verify`, and send it to the owner with the list of branches to push. The owner's push steps are in `docs/STATUS.md` under "Pushing a hand-off bundle".
+  Then verify it with `git bundle verify`, and send it to the owner with the list of branches to push. The owner's steps are in `docs/STATUS.md` under "Pushing".
 
 ## Workflow
 

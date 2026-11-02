@@ -5,7 +5,9 @@
 
 ## Owner actions (only the project owner can do these)
 
-- [ ] Create empty GitHub repos `EagleMind/flexova` (public) and `EagleMind/flexpad` (private), without a README, then push the hand-off bundle (see "Pushing a hand-off bundle" below)
+- [x] Create the public GitHub repo `EagleMind/flexova` and give the Claude GitHub App access to it (done 2026-11-02; all milestone branches pushed)
+- [ ] Create the private repo `EagleMind/flexpad` before M4, and give the Claude GitHub App access to it
+- [ ] Open one PR per milestone branch, each targeting the previous one (`m0-bootstrap` → `main`, `m1-spec` → `m0-bootstrap`, `m2-viewer` → `m1-spec`), or ask a Claude session to open them
 - [ ] Trademark search: FLEXOVA and FLEXPAD in USPTO, EUIPO and WIPO Global Brand Database, classes 9 and 42 (ask the attorney to compare against "Flexera")
 - [ ] Register a domain (flexova.com/.dev/.org), then replace the `namespaceUri` placeholder in `spec/constants.json`
 - [ ] Create the npm org `@flexova` and a PyPI account
@@ -27,7 +29,8 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 - [x] CLAUDE.md, ADR-0001 to ADR-0012
 - [x] CI workflow (lint, format, typecheck, test, build, Python)
 - [x] Commit history authored by EagleMind, with no AI attribution (rules in CLAUDE.md)
-- [ ] Pushed by the owner, and CI green on GitHub
+- [x] Pushed to GitHub
+- [ ] Reviewed and merged
 
 ### M1: Spec v0.1, conformance, reference implementations (M) · in review
 
@@ -61,9 +64,13 @@ Web reader (M4), editor (M5), pilot release (M6).
 
 M7 native wrappers · M8 Flexova Seal · M9 server, collaboration, Rust core if needed.
 
-## Pushing a hand-off bundle
+## Pushing
 
-Claude sessions don't push. At the end of each work chunk you receive `flexova.bundle` (every branch), with the list of branches to push. From the folder holding the bundle:
+The repo lives at https://github.com/EagleMind/flexova. Claude sessions that have the repo attached push milestone branches to `origin` when the owner asks. CI runs on every branch push; pull requests from forks also run it.
+
+### Pushing a hand-off bundle (fallback)
+
+When a session can't push, it hands off `flexova.bundle` (every branch) with the list of branches to push. From the folder holding the bundle:
 
 ```bash
 git clone --bare flexova.bundle flexova-handoff.git

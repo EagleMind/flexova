@@ -1,9 +1,10 @@
 name: Conformance
 
 on:
-  pull_request:
+  # Every branch push runs, so stacked milestone branches get checks (their PRs show them too).
   push:
-    branches: [main]
+  # Only pull requests from forks run here; same-repo PRs already have their push run.
+  pull_request:
 
 permissions:
   contents: read
@@ -18,6 +19,7 @@ env:
 
 jobs:
   fixtures:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: Fixtures are up to date
     runs-on: ubuntu-latest
     steps:
@@ -28,6 +30,7 @@ jobs:
       - run: python3 conformance/generate.py --check
 
   samples:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: Build writer samples
     runs-on: ubuntu-latest
     steps:
@@ -52,6 +55,7 @@ jobs:
           path: build/samples
 
   epubcheck:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: epubcheck (valid fixtures are valid EPUB 3.3)
     needs: samples
     runs-on: ubuntu-latest
@@ -79,6 +83,7 @@ jobs:
           --also build/samples/typescript.flexova build/samples/python.flexova
 
   ace:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: Ace by DAISY (accessibility)
     needs: samples
     runs-on: ubuntu-latest

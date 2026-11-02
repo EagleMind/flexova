@@ -1,9 +1,10 @@
 name: CI
 
 on:
-  pull_request:
+  # Every branch push runs, so stacked milestone branches get checks (their PRs show them too).
   push:
-    branches: [main]
+  # Only pull requests from forks run here; same-repo PRs already have their push run.
+  pull_request:
 
 permissions:
   contents: read
@@ -14,6 +15,7 @@ concurrency:
 
 jobs:
   node:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
     steps:
@@ -33,6 +35,7 @@ jobs:
       - run: pnpm --filter @flexova/viewer size
 
   python:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: Python (stdlib only)
     runs-on: ubuntu-latest
     strategy:
