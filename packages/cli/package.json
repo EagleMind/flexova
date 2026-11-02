@@ -1,0 +1,39 @@
+{
+  "name": "@flexova/cli",
+  "version": "0.0.0",
+  "description": "The flexova command: build Flexova (.flexova) documents from Markdown or DOCX, check, inspect, sign and verify them, and export static HTML or EPUB.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "flexova": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/main.d.ts",
+      "import": "./dist/main.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "keywords": [
+    "flexova",
+    "cli",
+    "markdown",
+    "docx",
+    "epub",
+    "document"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@flexova/core": "workspace:*",
+    "@flexova/html": "workspace:*",
+    "@flexova/import": "workspace:*"
+  }
+}
