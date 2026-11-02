@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { FlexovaError, pack, read, validate } from "./index.js";
+import { FlexovaError, pack, read, validate, write } from "./index.js";
 
 const fixture = (rel: string) =>
   readFileSync(new URL(`../../../conformance/${rel}`, import.meta.url));
@@ -16,8 +16,23 @@ describe("read()", () => {
     expect(pkg.navPath).toBe("OEBPS/nav.xhtml");
     expect(pkg.title).toBe("Flexova conformance fixture");
     expect(pkg.language).toBe("en");
+    expect(pkg.identifier).toBe("urn:uuid:7d1c9f40-1b7a-4c51-9a2e-000000000001");
+    expect(pkg.modified).toBe("2026-11-01T00:00:00Z");
+    expect(pkg.authors).toEqual([]);
     expect(pkg.tokens?.color?.accent?.light).toBe("#0b5fff");
     expect(pkg.report.valid).toBe(true);
+  });
+
+  it("returns the authors a writer recorded", async () => {
+    const bytes = await write({
+      identifier: "urn:uuid:00000000-0000-4000-8000-0000000000aa",
+      title: "T",
+      language: "en",
+      modified: "2026-11-02T00:00:00Z",
+      authors: ["Ann Author", "Bo Writer"],
+      chapters: [{ title: "One", body: '<section><h1 id="a">One</h1></section>' }],
+    });
+    expect((await read(bytes)).authors).toEqual(["Ann Author", "Bo Writer"]);
   });
 
   it("keeps warnings in the report", async () => {

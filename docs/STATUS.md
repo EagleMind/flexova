@@ -78,6 +78,8 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 
 ### M4–M6: FlexPad (private repo)
 
+M4 (the web reader) is in progress in the private `EagleMind/flexpad` repo, which tracks its own status. Hooks it needed from this repo are on branch `m4-reader-hooks`: `read()` metadata, the viewer's `--flexova-font-scale`, and print rendering.
+
 Web reader (M4), editor (M5), pilot release (M6).
 
 ### Later

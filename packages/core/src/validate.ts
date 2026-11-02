@@ -66,6 +66,9 @@ export interface Package {
   opfPath: string;
   title: string;
   language: string;
+  identifier: string;
+  modified: string;
+  authors: string[];
   items: Item[]; // document order
   byPath: Map<string, Item>;
   navPath: string | null;
@@ -205,6 +208,15 @@ export function checkPackage(entries: Map<string, Uint8Array>, c: Collector): Pa
         .map((e) => xmlTrim(e.text()))
         .find(Boolean) ?? "",
     language: langs[0] ?? "",
+    identifier:
+      children(metadata, DC_NS, "identifier")
+        .filter((e) => e.attr("id") === uid)
+        .map((e) => xmlTrim(e.text()))
+        .find(Boolean) ?? "",
+    modified: modified[0] ?? "",
+    authors: children(metadata, DC_NS, "creator")
+      .map((e) => xmlTrim(e.text()))
+      .filter(Boolean),
     items,
     byPath: new Map(items.map((i) => [i.path, i])),
     navPath: null,

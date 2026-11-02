@@ -18,6 +18,12 @@ export interface FlexovaPackage {
   opfPath: string;
   title: string;
   language: string;
+  /** The package's unique identifier (dc:identifier), stable across versions of a document. */
+  identifier: string;
+  /** dcterms:modified, e.g. "2026-11-02T00:00:00Z". */
+  modified: string;
+  /** dc:creator values, in document order. */
+  authors: string[];
   /** Content documents in reading order. */
   spine: string[];
   /** Package document items, in document order. */
@@ -49,6 +55,9 @@ export async function read(input: Uint8Array | ArrayBuffer): Promise<FlexovaPack
     opfPath: pkg.opfPath,
     title: pkg.title,
     language: pkg.language,
+    identifier: pkg.identifier,
+    modified: pkg.modified,
+    authors: pkg.authors,
     spine: pkg.spine,
     items: pkg.items.map(({ id, path, mediaType, properties }) => ({
       id,

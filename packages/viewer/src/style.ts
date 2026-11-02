@@ -75,7 +75,7 @@ export function viewerCss(tokens: unknown): string {
     `@media (prefers-color-scheme:dark){:host(:not([theme=light])){${dark}}:host(:not([theme=light])) ${dim}}` +
     `:host([theme=dark]) ${dim}` +
     ".fx{box-sizing:border-box;max-width:var(--flexova-measure);margin:0 auto;padding:1rem;color:var(--flexova-fg);" +
-    "font-family:var(--flexova-font-body);font-size:1.0625rem;line-height:1.6;overflow-wrap:break-word}" +
+    "font-family:var(--flexova-font-body);font-size:calc(1.0625rem*var(--flexova-font-scale,1));line-height:1.6;overflow-wrap:break-word}" +
     ".fx-doc{content-visibility:auto;contain-intrinsic-size:auto 1500px}" +
     ".fx-doc+.fx-doc{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--flexova-surface)}" +
     "h1,h2,h3,h4,h5,h6{font-family:var(--flexova-font-heading);line-height:1.25}" +
@@ -87,6 +87,7 @@ export function viewerCss(tokens: unknown): string {
     "aside[role=note]{padding:.5em 1em;border-radius:6px;background:var(--flexova-note-bg)}" +
     "aside[data-flexova-variant=warning],aside[data-flexova-variant=caution]{background:var(--flexova-warning-bg)}" +
     "math[display=block]{overflow-x:auto;max-width:100%}audio{max-width:100%}" +
-    ".fx-error{padding:1rem;border-radius:6px;background:var(--flexova-warning-bg)}"
+    ".fx-error{padding:1rem;border-radius:6px;background:var(--flexova-warning-bg)}" +
+    "@media print{.fx-doc{content-visibility:visible}.fx-doc+.fx-doc{break-before:page;border-top:0}}"
   );
 }

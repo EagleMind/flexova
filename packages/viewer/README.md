@@ -31,6 +31,12 @@ viewer.addEventListener("flexova-load", (e) => console.log(e.detail.title, e.det
 
 See [`examples/`](../../examples/) for a complete plain-HTML reader and React and Vue components, including the full API.
 
+**Styling hooks:**
+
+- `theme="light"` or `theme="dark"` overrides the system setting.
+- The `--flexova-font-scale` custom property (for example `1.25`) scales the document's text, for reading-size controls.
+- Printing renders every chapter, each starting on a new page.
+
 ## `@flexova/viewer/render`
 
 The environment-free rebuild routine the viewer uses, exported for other renderers (for example `@flexova/html`). It reads any parsed tree through a `Source` and writes through a `Sink`.

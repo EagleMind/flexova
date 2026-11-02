@@ -186,6 +186,37 @@ test.describe("navigation", () => {
   });
 });
 
+test.describe("host hooks", () => {
+  test("--flexova-font-scale scales the text", async ({ page }) => {
+    await open(page, "valid/links.flexova");
+    const size = (scale: string) =>
+      page.evaluate((s) => {
+        const v = document.getElementById("v") as HTMLElement;
+        v.style.setProperty("--flexova-font-scale", s);
+        const fx = v.shadowRoot?.querySelector(".fx") as HTMLElement;
+        return parseFloat(getComputedStyle(fx).fontSize);
+      }, scale);
+    const base = await size("1");
+    expect(await size("1.5")).toBeCloseTo(base * 1.5, 1);
+  });
+
+  test("print renders every chapter, each on a new page", async ({ page }) => {
+    await open(page, "valid/links.flexova");
+    await page.emulateMedia({ media: "print" });
+    const styles = await page.evaluate(() =>
+      [...(document.getElementById("v")?.shadowRoot?.querySelectorAll(".fx-doc") ?? [])].map(
+        (d) => {
+          const cs = getComputedStyle(d);
+          return [cs.contentVisibility || "visible", cs.breakBefore];
+        },
+      ),
+    );
+    expect(styles.length).toBe(3);
+    expect(styles.every(([cv]) => cv === "visible")).toBe(true);
+    expect(styles.slice(1).every(([, bb]) => bb === "page")).toBe(true);
+  });
+});
+
 test.describe("offline", () => {
   test("loads a document with the network switched off", async ({
     page,
