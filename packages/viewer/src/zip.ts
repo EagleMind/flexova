@@ -69,9 +69,9 @@ export function unzip(data: Uint8Array): ReadEntry {
     const out = new Uint8Array(e.usize);
     let size = 0;
     // An in-memory stream: Blob.stream() goes through the network process in WebKit.
-    const reader = new ReadableStream<Uint8Array>({
+    const reader = new ReadableStream<Uint8Array<ArrayBuffer>>({
       start(c) {
-        c.enqueue(raw);
+        c.enqueue(raw as Uint8Array<ArrayBuffer>);
         c.close();
       },
     })
