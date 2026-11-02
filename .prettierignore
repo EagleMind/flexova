@@ -9,6 +9,7 @@ spec/LICENSE
 
 # Generated files: regenerate instead of reformatting
 conformance/expected.json
+conformance/signatures/*.json
 conformance/vectors/*.json
 python/src/flexova/_data
 packages/core/src/spec

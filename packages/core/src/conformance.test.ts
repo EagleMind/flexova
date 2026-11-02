@@ -41,7 +41,7 @@ describe("compileTokens golden vectors", () => {
 });
 
 describe("bundled spec data", () => {
-  it.each(["constants.json", "errors.json", "profile-1.0.json"])(
+  it.each(["constants.json", "errors.json", "profile-1.0.json", "signature.json"])(
     "%s matches spec/ (run `pnpm sync:spec`)",
     (name) => {
       const source = name.startsWith("profile") ? `spec/profile/${name}` : `spec/${name}`;

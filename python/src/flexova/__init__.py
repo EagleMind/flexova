@@ -4,6 +4,7 @@ Naming constants must match ``spec/constants.json`` (enforced by tests/test_cons
 """
 
 from ._report import FlexovaError, Issue, Report
+from ._sign import Verification, generate_key, jwk_thumbprint, sign, verify
 from ._tokens import compile_tokens
 from ._validate import validate
 from ._write import write
@@ -21,4 +22,16 @@ NAMESPACE_URI = "https://flexova.example/ns/1.0#"
 MANIFEST_PATH = "META-INF/flexova.json"
 VIEWER_ELEMENT = "flexova-viewer"
 
-__all__ = ["validate", "write", "compile_tokens", "Report", "Issue", "FlexovaError"]
+__all__ = [
+    "validate",
+    "write",
+    "compile_tokens",
+    "sign",
+    "verify",
+    "generate_key",
+    "jwk_thumbprint",
+    "Report",
+    "Issue",
+    "FlexovaError",
+    "Verification",
+]

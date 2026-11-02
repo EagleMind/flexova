@@ -11,6 +11,7 @@ def _load(name: str) -> dict:
 CONSTANTS = _load("constants.json")
 ERRORS = _load("errors.json")
 PROFILE = _load("profile-1.0.json")
+SIGNATURE = _load("signature.json")
 
 NS = PROFILE["namespaces"]
 XHTML_NS = NS["xhtml"]

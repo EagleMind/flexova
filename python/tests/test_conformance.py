@@ -32,6 +32,7 @@ class SpecSyncTest(unittest.TestCase):
             "constants.json": ROOT / "spec" / "constants.json",
             "errors.json": ROOT / "spec" / "errors.json",
             "profile-1.0.json": ROOT / "spec" / "profile" / "profile-1.0.json",
+            "signature.json": ROOT / "spec" / "signature.json",
         }
         for name, source in pairs.items():
             with self.subTest(file=name):

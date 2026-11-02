@@ -2,6 +2,7 @@
 import constantsJson from "./spec/constants.json" with { type: "json" };
 import errorsJson from "./spec/errors.json" with { type: "json" };
 import profileJson from "./spec/profile-1.0.json" with { type: "json" };
+import signatureJson from "./spec/signature.json" with { type: "json" };
 
 export type Severity = "error" | "warning";
 export interface CodeSpec {
@@ -65,6 +66,18 @@ export const CONSTANTS = constantsJson as Record<string, string>;
 export const CODES = (errorsJson as unknown as { codes: Record<string, CodeSpec> }).codes;
 export const PHASES = (errorsJson as unknown as { phases: string[] }).phases;
 export const PROFILE = profileJson as unknown as Profile;
+
+export interface SignatureSpec {
+  path: string;
+  signedPath: string;
+  maxBytes: number;
+  algorithms: { sign: string; verify: string[] };
+  header: { required: string[]; optional: string[]; forbidden: string[] };
+  key: { kty: string; crv: string; use: string };
+  order: string[];
+  codes: Record<string, { message: string }>;
+}
+export const SIGNATURE = signatureJson as SignatureSpec;
 
 export const NS = PROFILE.namespaces;
 export const CONTAINER_NS = "urn:oasis:names:tc:opendocument:xmlns:container";

@@ -10,6 +10,7 @@ const files = {
   "spec/constants.json": "constants.json",
   "spec/errors.json": "errors.json",
   "spec/profile/profile-1.0.json": "profile-1.0.json",
+  "spec/signature.json": "signature.json",
 };
 const targets = ["python/src/flexova/_data", "packages/core/src/spec"];
 

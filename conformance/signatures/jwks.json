@@ -1,0 +1,25 @@
+{
+  "keys": [
+    {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "kid": "conformance-1",
+      "x": "KVI4e1RxiRjKokzQ7mlJdeHmbhrL8aruWG2e856Umu0",
+      "use": "sig",
+      "alg": "Ed25519"
+    },
+    {
+      "kty": "OKP",
+      "crv": "Ed448",
+      "kid": "ed448-key",
+      "x": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "kid": "encryption-key",
+      "x": "fgKPE5Cw90CdtWdXLV2U2RIjwV0H6SBk--gWsi18Gf4",
+      "use": "enc"
+    }
+  ]
+}

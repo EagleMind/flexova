@@ -861,6 +861,247 @@ def _():
 def _(): return manifest_edit(lambda m: {**m, "level": "L1"})
 
 
+# --- signatures (spec section 11) -----------------------------------------------------------------
+# A minimal Ed25519 signer (RFC 8032, section 5.1), kept here so the generator needs no implementation.
+_P = 2**255 - 19
+_L = 2**252 + 27742317777372353535851937790883648493
+_D = -121665 * pow(121666, _P - 2, _P) % _P
+
+
+def _ed_add(a, b):
+    x = (a[1] - a[0]) * (b[1] - b[0]) % _P
+    y = (a[1] + a[0]) * (b[1] + b[0]) % _P
+    c = 2 * a[3] * b[3] * _D % _P
+    d = 2 * a[2] * b[2] % _P
+    e, f, g, h = y - x, d - c, d + c, y + x
+    return (e * f % _P, g * h % _P, f * g % _P, e * h % _P)
+
+
+def _ed_mul(k, pt):
+    q = (0, 1, 1, 0)
+    while k:
+        if k & 1:
+            q = _ed_add(q, pt)
+        pt, k = _ed_add(pt, pt), k >> 1
+    return q
+
+
+def _ed_encode(pt):
+    zi = pow(pt[2], _P - 2, _P)
+    x, y = pt[0] * zi % _P, pt[1] * zi % _P
+    return (y | (x & 1) << 255).to_bytes(32, "little")
+
+
+_GY = 4 * pow(5, _P - 2, _P) % _P
+_GX = pow((_GY * _GY - 1) * pow(_D * _GY * _GY + 1, _P - 2, _P), (_P + 3) // 8, _P)
+if (_GX * _GX - (_GY * _GY - 1) * pow(_D * _GY * _GY + 1, _P - 2, _P)) % _P:
+    _GX = _GX * pow(2, (_P - 1) // 4, _P) % _P
+_GX = _P - _GX if _GX & 1 else _GX
+_G = (_GX, _GY, 1, _GX * _GY % _P)
+
+
+def _ed_expand(seed):
+    h = hashlib.sha512(seed).digest()
+    return (int.from_bytes(h[:32], "little") & ((1 << 254) - 8)) | (1 << 254), h[32:]
+
+
+def ed_public(seed):
+    return _ed_encode(_ed_mul(_ed_expand(seed)[0], _G))
+
+
+def ed_sign(seed, msg):
+    a, prefix = _ed_expand(seed)
+    pub = _ed_encode(_ed_mul(a, _G))
+    r = int.from_bytes(hashlib.sha512(prefix + msg).digest(), "little") % _L
+    big_r = _ed_encode(_ed_mul(r, _G))
+    k = int.from_bytes(hashlib.sha512(big_r + pub + msg).digest(), "little") % _L
+    return big_r + ((r + k * a) % _L).to_bytes(32, "little")
+
+
+# RFC 8032, section 7.1, TEST 1.
+assert ed_sign(bytes.fromhex("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"), b"").hex() == (
+    "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"
+)
+
+SIGNATURE = json.loads((SPEC / "signature.json").read_text("utf-8"))
+SIG_PATH = SIGNATURE["path"]
+SIG_FIXTURES = []
+TRUSTED_SEED = hashlib.sha256(b"flexova conformance signing key 1").digest()
+OTHER_SEED = hashlib.sha256(b"flexova conformance signing key 2").digest()
+KID = "conformance-1"
+
+
+def b64u(data):
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
+
+
+def ed_jwk(seed, kid, **extra):
+    return {"kty": "OKP", "crv": "Ed25519", "kid": kid, "x": b64u(ed_public(seed)), **extra}
+
+
+# Verifiers trust every key in this set; only conformance-1 is usable for verification.
+JWKS = {"keys": [
+    ed_jwk(TRUSTED_SEED, KID, use="sig", alg="Ed25519"),
+    {"kty": "OKP", "crv": "Ed448", "kid": "ed448-key", "x": b64u(bytes(57))},
+    ed_jwk(OTHER_SEED, "encryption-key", use="enc"),
+]}
+
+
+def jws(manifest, seed=TRUSTED_SEED, header=None, payload="", signature=None):
+    head = b64u(json.dumps(header or {"alg": "Ed25519", "kid": KID}, separators=(",", ":")).encode("utf-8"))
+    sig = ed_sign(seed, f"{head}.{b64u(manifest)}".encode("ascii"))
+    sig = signature(sig) if signature else sig
+    return f"{head}.{payload}.{b64u(sig)}\n".encode("ascii")
+
+
+def signed(p=None, after=None, **jws_kw):
+    """Sign p's manifest; after(p) may then change the package without re-signing."""
+    p = p or pkg()
+    manifest = p.files()["META-INF/flexova.json"]
+    p.extra = p.extra + [(SIG_PATH, jws(manifest, **jws_kw))]
+    if after:
+        p.manifest_edit = lambda _m: manifest
+        after(p)
+    return p.build()
+
+
+def with_sig(data):
+    p = pkg()
+    p.extra = [(SIG_PATH, data)]
+    return p.build()
+
+
+def sig_fixture(name, code, description):
+    def register(builder):
+        assert code is None or code in SIGNATURE["codes"], f"{name}: unknown code {code}"
+        SIG_FIXTURES.append((name, code, description, builder))
+        return builder
+    return register
+
+
+@sig_fixture("signed", None, "Signed with the trusted key (alg Ed25519, RFC 9864).")
+def _(): return signed()
+
+
+@sig_fixture("signed-legacy-alg", None, "Signed with alg EdDSA (RFC 8037), which verifiers still accept.")
+def _(): return signed(header={"alg": "EdDSA", "kid": KID})
+
+
+@sig_fixture("signed-optional-header", None, "The optional typ and iat header parameters, plus an unknown one, are allowed.")
+def _(): return signed(header={"alg": "Ed25519", "kid": KID, "typ": "JOSE", "iat": 1793491200, "x-note": "ignored"})
+
+
+@sig_fixture("unsigned", "SIG_MISSING", "A valid package without a signature file.")
+def _(): return pkg().build()
+
+
+@sig_fixture("tampered-entry", "SIG_PACKAGE_INVALID", "A chapter changed after signing, so it no longer matches its manifest hash.")
+def _(): return signed(after=lambda p: setattr(p, "replace", {CH: xhtml(BODY.replace("Hello", "Goodbye"))}))
+
+
+@sig_fixture("tampered-manifest", "SIG_INVALID", "A design token changed in the manifest after signing; the package is still valid.")
+def _():
+    def edit(p):
+        manifest = json.loads(p.files()["META-INF/flexova.json"])
+        manifest["tokens"]["color"]["accent"]["light"] = "#d00000"
+        p.manifest_edit = lambda _m: (json.dumps(manifest, indent=2) + "\n").encode()
+    return signed(after=edit)
+
+
+@sig_fixture("wrong-key", "SIG_INVALID", "Signed with a different private key under the trusted key's ID.")
+def _(): return signed(seed=OTHER_SEED)
+
+
+@sig_fixture("unknown-kid", "SIG_UNKNOWN_KEY", "The key ID is not in the trusted key set.")
+def _(): return signed(header={"alg": "Ed25519", "kid": "someone-else"})
+
+
+@sig_fixture("kid-wrong-curve", "SIG_UNKNOWN_KEY", "The key ID names a trusted Ed448 key, which is not usable.")
+def _(): return signed(header={"alg": "Ed25519", "kid": "ed448-key"})
+
+
+@sig_fixture("kid-wrong-use", "SIG_UNKNOWN_KEY", "The key ID names a trusted Ed25519 key marked for encryption (use: enc).")
+def _(): return signed(seed=OTHER_SEED, header={"alg": "Ed25519", "kid": "encryption-key"})
+
+
+@sig_fixture("alg-none", "SIG_ALGORITHM", "An unsecured JWS (alg none) with an empty signature.")
+def _(): return signed(header={"alg": "none", "kid": KID}, signature=lambda _s: b"")
+
+
+@sig_fixture("alg-hs256", "SIG_ALGORITHM", "An HMAC algorithm, as in key-confusion attacks.")
+def _(): return signed(header={"alg": "HS256", "kid": KID})
+
+
+@sig_fixture("embedded-jwk", "SIG_MALFORMED", "The header carries its own key (jwk), which verifiers must never trust.")
+def _(): return signed(seed=OTHER_SEED, header={"alg": "Ed25519", "kid": KID, "jwk": ed_jwk(OTHER_SEED, KID)})
+
+
+@sig_fixture("crit-header", "SIG_MALFORMED", "An unencoded payload (b64: false) declared critical.")
+def _(): return signed(header={"alg": "Ed25519", "kid": KID, "b64": False, "crit": ["b64"]})
+
+
+@sig_fixture("missing-kid", "SIG_MALFORMED", "The protected header has no key ID.")
+def _(): return signed(header={"alg": "Ed25519"})
+
+
+@sig_fixture("kid-not-string", "SIG_MALFORMED", "The key ID is a number.")
+def _(): return signed(header={"alg": "Ed25519", "kid": 1})
+
+
+@sig_fixture("iat-not-integer", "SIG_MALFORMED", "The signing time is a string.")
+def _(): return signed(header={"alg": "Ed25519", "kid": KID, "iat": "2026-11-02"})
+
+
+@sig_fixture("header-not-object", "SIG_MALFORMED", "The protected header is a JSON array.")
+def _(): return with_sig(f"{b64u(b'[1]')}..{b64u(bytes(64))}".encode())
+
+
+@sig_fixture("attached-payload", "SIG_MALFORMED", "The payload is attached instead of detached.")
+def _():
+    p = pkg()
+    return signed(p, payload=b64u(p.files()["META-INF/flexova.json"]))
+
+
+@sig_fixture("not-jws", "SIG_MALFORMED", "The signature file is not a JWS.")
+def _(): return with_sig(b"this is not a signature\n")
+
+
+@sig_fixture("padded-base64", "SIG_MALFORMED", "The signature segment uses base64 padding, which base64url in JWS forbids.")
+def _():
+    p = pkg()
+    data = jws(p.files()["META-INF/flexova.json"]).rstrip(b"\n") + b"==\n"
+    p.extra = [(SIG_PATH, data)]
+    return p.build()
+
+
+@sig_fixture("oversized", "SIG_MALFORMED", "The signature file exceeds the 4,096-byte limit.")
+def _(): return signed(header={"alg": "Ed25519", "kid": KID, "x-padding": "x" * 4096})
+
+
+@sig_fixture("signature-not-reduced", "SIG_INVALID", "A malleated signature whose S value is not reduced modulo L (RFC 8032).")
+def _(): return signed(signature=lambda s: s[:32] + (int.from_bytes(s[32:], "little") + _L).to_bytes(32, "little"))
+
+
+@sig_fixture("signature-truncated", "SIG_INVALID", "A 63-byte signature.")
+def _(): return signed(signature=lambda s: s[:63])
+
+
+def generate_signatures(outputs):
+    expected = {}
+    for name, code, description, builder in SIG_FIXTURES:
+        rel = f"signatures/{name}.flexova"
+        assert rel not in outputs, f"duplicate fixture {rel}"
+        outputs[rel] = builder()
+        expected[rel] = {"code": code, "description": description}
+    outputs["signatures/jwks.json"] = (json.dumps(JWKS, indent=2) + "\n").encode("utf-8")
+    outputs["signatures/expected.json"] = (json.dumps({
+        "$comment": "Generated by conformance/generate.py. Verify each fixture against the trusted keys in jwks.json; "
+                    "every verifier must report exactly this code (null means the signature verifies).",
+        "trustedKeys": "jwks.json",
+        "fixtures": expected,
+    }, indent=2) + "\n").encode("utf-8")
+
+
 # --- driver -------------------------------------------------------------------------------------------
 def generate():
     outputs, expected = {}, {}
@@ -880,14 +1121,18 @@ def generate():
         "fixtures": expected,
     }
     outputs["expected.json"] = (json.dumps(manifest, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    generate_signatures(outputs)
     return outputs
+
+
+CATEGORIES = ("valid", "invalid", "hostile", "signatures")
 
 
 def main():
     check = "--check" in sys.argv[1:]
     outputs = generate()
-    stale = [p for c in ("valid", "invalid", "hostile") for p in sorted((HERE / c).glob("*.flexova"))
-             if f"{c}/{p.name}" not in outputs] if all((HERE / c).exists() for c in ("valid", "invalid", "hostile")) else []
+    stale = [p for c in CATEGORIES for p in sorted((HERE / c).glob("*.flexova"))
+             if f"{c}/{p.name}" not in outputs] if all((HERE / c).exists() for c in CATEGORIES) else []
     drift = [rel for rel, data in outputs.items() if not (HERE / rel).exists() or (HERE / rel).read_bytes() != data]
     if check:
         if drift or stale:
@@ -895,7 +1140,7 @@ def main():
             for rel in drift + [str(p.relative_to(HERE)) for p in stale]:
                 print("  ", rel)
             sys.exit(1)
-        print(f"conformance fixtures up to date ({len(outputs) - 1} fixtures)")
+        print(f"conformance fixtures up to date ({len(FIXTURES)} fixtures, {len(SIG_FIXTURES)} signature fixtures)")
         return
     for p in stale:
         p.unlink()
@@ -903,7 +1148,7 @@ def main():
         (HERE / rel).parent.mkdir(parents=True, exist_ok=True)
         (HERE / rel).write_bytes(data)
     counts = {c: sum(1 for f in FIXTURES if f[0] == c) for c in ("valid", "invalid", "hostile")}
-    print(f"wrote {sum(counts.values())} fixtures {counts} and expected.json")
+    print(f"wrote {sum(counts.values())} fixtures {counts}, {len(SIG_FIXTURES)} signature fixtures and expected.json files")
 
 
 if __name__ == "__main__":

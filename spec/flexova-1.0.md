@@ -256,9 +256,40 @@ A Viewer displays packages that may be hostile. It:
 - **Major versions** change the rules incompatibly and are refused (`MAN_UNSUPPORTED_VERSION`, `OPF_PROFILE_UNSUPPORTED`).
 - **Editors** MUST NOT silently drop content they cannot represent. They MUST either preserve it unchanged or ask the user before removing it.
 
-## 11. Signatures (reserved)
+## 11. Signatures
 
-A package MAY contain `META-INF/flexova.sig.jws`: a detached JWS (RFC 7515) using EdDSA (Ed25519) over the exact bytes of `META-INF/flexova.json`. Publisher keys are published as a JWKS at `https://<publisher-domain>/.well-known/flexova/jwks.json`. Version 1.0 validators ignore this file. Verification rules will be specified with the reference tooling.
+A signature proves who published a package and that nothing changed since. It is optional. The rules are data in [`signature.json`](signature.json); this section explains them. **Validators ignore the signature file**: a signature never makes a package valid or invalid.
+
+### 11.1 Format
+
+- **Location:** `META-INF/flexova.sig.jws`, an ASCII file of at most 4,096 bytes, optionally ending with one line feed.
+- **Serialization:** JWS Compact Serialization (RFC 7515) with a **detached payload**: `BASE64URL(header)..BASE64URL(signature)`, with an empty middle segment. Base64url has no padding.
+- **Payload:** the exact bytes of `META-INF/flexova.json`. The manifest lists every other entry with its SHA-256 (section 7), and validation rejects a package whose entries don't match that list, so signing the manifest covers the whole package. The signing input is `BASE64URL(header) || "." || BASE64URL(manifest)`, as in RFC 7515.
+- **Algorithm:** Ed25519 (RFC 8032). Signers MUST use `"alg": "Ed25519"` (RFC 9864). Verifiers MUST also accept the older `"EdDSA"` (RFC 8037).
+- **Protected header:** a JSON object.
+  - Required: `alg` and `kid`, a non-empty string naming the signing key.
+  - Optional: `typ` (a string) and `iat` (signing time in seconds since the epoch, a non-negative integer). Other parameters are ignored.
+  - Forbidden: `crit`, `b64`, `jku`, `jwk`, `x5u` and `x5c`. Keys are never taken from the signature itself, only from the verifier's trusted set.
+- **Keys:** JSON Web Keys (RFC 8037) with `kty` `OKP` and `crv` `Ed25519`. The default key ID is the key's RFC 7638 thumbprint. Publishers SHOULD publish their public keys as a JWKS at `https://<publisher-domain>/.well-known/flexova/jwks.json`.
+
+Signing adds or replaces the signature file. It changes nothing else, so earlier hashes stay valid. A package has at most one signature.
+
+### 11.2 Verification
+
+A verifier has a set of **trusted keys**, which it obtained out of band. It checks the following steps in order and stops at the first failure, so every result is exactly one code:
+
+| Step                                                                                                                                                    | Failure code          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1. The package validates (section 8).                                                                                                                   | `SIG_PACKAGE_INVALID` |
+| 2. The signature file exists.                                                                                                                           | `SIG_MISSING`         |
+| 3. The file is a well-formed compact JWS with a detached payload, within the size limit, and its header follows section 11.1.                           | `SIG_MALFORMED`       |
+| 4. `alg` is `Ed25519` or `EdDSA`.                                                                                                                       | `SIG_ALGORITHM`       |
+| 5. A trusted key has the header's `kid`, `kty` `OKP`, `crv` `Ed25519`, a 32-byte `x`, and no `use`, `key_ops` or `alg` that rules out verification.     | `SIG_UNKNOWN_KEY`     |
+| 6. The signature verifies with one such key under RFC 8032. Verifiers MUST reject non-canonical encodings and an `S` that is not below the group order. | `SIG_INVALID`         |
+
+Otherwise the signature is valid. The conformance suite's `signatures/` folder holds a fixture for every code, and the trusted keys to check them with.
+
+A valid signature means the key holder published this exact package. Whether to trust that key holder is the verifier's decision.
 
 ## 12. Security considerations
 
@@ -285,7 +316,7 @@ A package MAY contain `META-INF/flexova.sig.jws`: a detached JWS (RFC 7515) usin
 - [RFC 2119]: Key words for use in RFCs to Indicate Requirement Levels.
 - [RFC 8174]: Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words.
 - EPUB 3.3, W3C Recommendation; EPUB Accessibility 1.1.
-- RFC 7515: JSON Web Signature; RFC 8037: EdDSA in JOSE.
+- RFC 7515: JSON Web Signature; RFC 7638: JWK Thumbprint; RFC 8032: Edwards-Curve Digital Signature Algorithm (EdDSA); RFC 8037: EdDSA in JOSE; RFC 9864: Fully-Specified Algorithms for JOSE and COSE.
 - WCAG 2.2: contrast ratio and relative luminance.
 
 [RFC 2119]: https://www.rfc-editor.org/rfc/rfc2119

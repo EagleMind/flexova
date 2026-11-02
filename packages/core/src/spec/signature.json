@@ -1,0 +1,51 @@
+{
+  "$comment": "Flexova signatures 1.0. Normative: signers and verifiers follow these rules, and verifiers report exactly these codes (spec/flexova-1.0.md, section 11). Verification checks the steps in `order` and stops at the first failure, so every result is a single code. Signatures never affect validation: validators ignore the signature file.",
+  "version": "1.0",
+  "path": "META-INF/flexova.sig.jws",
+  "signedPath": "META-INF/flexova.json",
+  "serialization": "JWS Compact Serialization with a detached payload (RFC 7515, section 7.1 and appendix F): BASE64URL(protected header) '..' BASE64URL(signature). The payload is the exact bytes of signedPath.",
+  "maxBytes": 4096,
+  "algorithms": {
+    "sign": "Ed25519",
+    "verify": ["Ed25519", "EdDSA"]
+  },
+  "header": {
+    "required": ["alg", "kid"],
+    "optional": ["iat", "typ"],
+    "forbidden": ["crit", "b64", "jku", "jwk", "x5u", "x5c"]
+  },
+  "key": {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "use": "sig"
+  },
+  "jwksWellKnownPath": "/.well-known/flexova/jwks.json",
+  "order": [
+    "SIG_PACKAGE_INVALID",
+    "SIG_MISSING",
+    "SIG_MALFORMED",
+    "SIG_ALGORITHM",
+    "SIG_UNKNOWN_KEY",
+    "SIG_INVALID"
+  ],
+  "codes": {
+    "SIG_PACKAGE_INVALID": {
+      "message": "The package does not validate, so its signature cannot be trusted (for example, an entry no longer matches its hash)."
+    },
+    "SIG_MISSING": {
+      "message": "The package has no signature file."
+    },
+    "SIG_MALFORMED": {
+      "message": "The signature file is not a compact JWS with a detached payload, is too large, or has an invalid protected header."
+    },
+    "SIG_ALGORITHM": {
+      "message": "The signature uses an algorithm other than Ed25519."
+    },
+    "SIG_UNKNOWN_KEY": {
+      "message": "None of the trusted keys is a usable Ed25519 key with the signature's key ID."
+    },
+    "SIG_INVALID": {
+      "message": "The signature does not match the manifest and key."
+    }
+  }
+}
