@@ -10,20 +10,22 @@ Flexova (`.flexova`) is an open, reflowable, accessible, offline-first document 
 
 ## Commands
 
-| Task               | Command                                                         |
-| ------------------ | --------------------------------------------------------------- |
-| Install            | `pnpm install`                                                  |
-| Everything CI runs | `pnpm check`                                                    |
-| Lint / format      | `pnpm lint` · `pnpm format`                                     |
-| Typecheck          | `pnpm typecheck`                                                |
-| TS tests           | `pnpm test` (Vitest; every `packages/*` folder is a project)    |
-| Python tests       | `pnpm test:python` (stdlib `unittest`, `PYTHONPATH=python/src`) |
-| Build              | `pnpm build` (tsup → `packages/*/dist`)                         |
+| Task                | Command                                                         |
+| ------------------- | --------------------------------------------------------------- |
+| Install             | `pnpm install`                                                  |
+| Everything CI runs  | `pnpm check`                                                    |
+| Lint / format       | `pnpm lint` · `pnpm format`                                     |
+| Typecheck           | `pnpm typecheck`                                                |
+| TS tests            | `pnpm test` (Vitest; every `packages/*` folder is a project)    |
+| Python tests        | `pnpm test:python` (stdlib `unittest`, `PYTHONPATH=python/src`) |
+| Build               | `pnpm build` (tsup → `packages/*/dist`)                         |
+| Sync spec copies    | `pnpm sync:spec` (after editing anything in `spec/*.json`)      |
+| Regenerate fixtures | `python3 conformance/generate.py` (`--check` in CI)             |
 
 ## Layout
 
 - `spec/`: specification and **machine-readable rules** (`constants.json`; `profile/` and `schema/` from M1). CC-BY-4.0.
-- `conformance/` (M1+): shared fixtures plus `expected.json` with verdicts and error codes.
+- `conformance/`: `generate.py` (stdlib, never imports an implementation) writes `valid/`, `invalid/`, `hostile/` fixtures and `expected.json`; `vectors/` holds golden outputs; `external_checks.py` runs epubcheck and Ace.
 - `packages/core`: `@flexova/core`, isomorphic read/write/validate.
 - `packages/{viewer,html,import,cli}` (M2–M3) and `packages/seal` (M8).
 - `python/`: `flexova` on PyPI, **standard library only**.

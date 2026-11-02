@@ -126,7 +126,37 @@
     },
     "body": { "category": "structural", "content": { "type": "blocks" } },
 
-    "section": { "category": "block", "content": { "type": "blocks" } },
+    "section": {
+      "category": "block",
+      "content": { "type": "blocks" },
+      "attributes": {
+        "role": {
+          "enum": [
+            "doc-abstract",
+            "doc-acknowledgments",
+            "doc-afterword",
+            "doc-appendix",
+            "doc-bibliography",
+            "doc-chapter",
+            "doc-colophon",
+            "doc-conclusion",
+            "doc-credits",
+            "doc-dedication",
+            "doc-endnotes",
+            "doc-epigraph",
+            "doc-epilogue",
+            "doc-errata",
+            "doc-foreword",
+            "doc-glossary",
+            "doc-index",
+            "doc-introduction",
+            "doc-part",
+            "doc-preface",
+            "doc-prologue"
+          ]
+        }
+      }
+    },
     "nav": {
       "category": "block",
       "content": {
@@ -135,7 +165,8 @@
           { "anyOf": ["h1", "h2", "h3", "h4", "h5", "h6"], "min": 0, "max": 1 },
           { "element": "ol", "min": 1, "max": 1 }
         ]
-      }
+      },
+      "attributes": { "role": { "enum": ["doc-toc", "doc-pagelist", "navigation"] } }
     },
     "h1": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },
     "h2": { "category": "block", "content": { "type": "inline" }, "required": ["id"] },

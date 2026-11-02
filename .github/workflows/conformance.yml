@@ -1,0 +1,110 @@
+name: Conformance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conformance-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  EPUBCHECK_VERSION: "5.2.1"
+  ACE_VERSION: "1.4.6"
+
+jobs:
+  fixtures:
+    name: Fixtures are up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python3 conformance/generate.py --check
+
+  samples:
+    name: Build writer samples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pnpm install --frozen-lockfile && pnpm build
+      - name: Write one package with each implementation
+        run: |
+          mkdir -p build/samples
+          node scripts/write-sample.mjs build/samples/typescript.flexova
+          PYTHONPATH=python/src:python/tests python3 -c "import flexova, test_write; open('build/samples/python.flexova', 'wb').write(flexova.write(test_write.sample()))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: writer-samples
+          path: build/samples
+
+  epubcheck:
+    name: epubcheck (valid fixtures are valid EPUB 3.3)
+    needs: samples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          name: writer-samples
+          path: build/samples
+      - name: Download epubcheck
+        run: |
+          curl -sSfL -o epubcheck.zip "https://github.com/w3c/epubcheck/releases/download/v${EPUBCHECK_VERSION}/epubcheck-${EPUBCHECK_VERSION}.zip"
+          unzip -q epubcheck.zip -d "$RUNNER_TEMP"
+      - name: Run epubcheck
+        run: >
+          python3 conformance/external_checks.py epubcheck
+          --cmd "java -jar $RUNNER_TEMP/epubcheck-${EPUBCHECK_VERSION}/epubcheck.jar"
+          --also build/samples/typescript.flexova build/samples/python.flexova
+
+  ace:
+    name: Ace by DAISY (accessibility)
+    needs: samples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          name: writer-samples
+          path: build/samples
+      - name: Allow Chrome's sandbox on Ubuntu 24.04 runners
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Install Ace (Puppeteer CLI; skip Electron download)
+        run: |
+          mkdir -p "$RUNNER_TEMP/ace" && cd "$RUNNER_TEMP/ace"
+          npm init -y > /dev/null
+          PUPPETEER_SKIP_DOWNLOAD=1 npm install --no-audit --no-fund --ignore-scripts "@daisy/ace@${ACE_VERSION}"
+      - name: Run Ace
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+        run: >
+          python3 conformance/external_checks.py ace
+          --cmd "node $RUNNER_TEMP/ace/node_modules/.bin/ace-puppeteer"
+          --also build/samples/typescript.flexova build/samples/python.flexova

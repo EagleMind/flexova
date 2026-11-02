@@ -12,7 +12,7 @@ Under the hood, an unencrypted Flexova file is also a valid **EPUB 3.3** package
 
 **FlexPad**, the offline-first reader and editor, is developed separately.
 
-> **Status: pre-alpha (milestone M0, bootstrap).** The specification and reference implementations are being built in the open. See [`docs/STATUS.md`](docs/STATUS.md) for progress and [`docs/decisions/`](docs/decisions/) for the reasoning behind the design.
+> **Status: pre-alpha (milestone M1: spec draft 0.1 and reference implementations).** The specification and reference implementations are being built in the open. See [`docs/STATUS.md`](docs/STATUS.md) for progress and [`docs/decisions/`](docs/decisions/) for the reasoning behind the design.
 
 ## Repository layout
 
@@ -24,7 +24,7 @@ Under the hood, an unencrypted Flexova file is also a valid **EPUB 3.3** package
 | `docs/`         | Project status and architecture decision records (ADRs).                                            |
 | `prototypes/`   | Design-phase experiments that proved the architecture (reference only).                             |
 
-Planned next: `conformance/` (shared test suite), `packages/viewer` (`<flexova-viewer>`), `packages/html` (single-file HTML), `packages/import`, `packages/cli` (`flexova`).
+Planned next: `packages/viewer` (`<flexova-viewer>`), `packages/html` (single-file HTML), `packages/import`, `packages/cli` (`flexova`).
 
 ## Development
 

@@ -123,7 +123,7 @@ export async function write(input: WriteInput): Promise<Uint8Array> {
       dir,
       navTitle,
       "styles/flexova.css",
-      `<nav epub:type="toc" id="toc"><h1 id="toc-title">${text(navTitle)}</h1><ol>${toc}</ol></nav>`,
+      `<nav epub:type="toc" role="doc-toc" id="toc"><h1 id="toc-title">${text(navTitle)}</h1><ol>${toc}</ol></nav>`,
     ),
   );
   files.set("styles/flexova.css", utf8(compileTokens(input.tokens)));

@@ -1,7 +1,7 @@
 # Status
 
-**Current milestone:** M0, Bootstrap (in review)
-**Next task:** M1.1, write `spec/profile/profile-1.0.json` and `spec/schema/manifest.schema.json`
+**Current milestone:** M1, Spec v0.1 + conformance + reference implementations (in review, branch `m1-spec`)
+**Next task:** M2.1, port `prototypes/flex/web/flex-viewer.js` to `packages/viewer` (`<flexova-viewer>`), generating its allowlist from the profile
 
 ## Owner actions (only the project owner can do these)
 
@@ -29,15 +29,16 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 - [x] Commit history authored by EagleMind, with no AI attribution (rules in CLAUDE.md)
 - [ ] Pushed by the owner, and CI green on GitHub
 
-### M1: Spec v0.1, conformance, reference implementations (M)
+### M1: Spec v0.1, conformance, reference implementations (M) · in review
 
-- [ ] M1.1 `spec/profile/profile-1.0.json` (elements, attributes, allowed children, required attributes, block vs inline, so it can generate an editor schema) and `spec/schema/manifest.schema.json`
-- [ ] M1.2 `spec/flexova-1.0.md`: container, profile, manifest, tokens, metadata, conformance classes (Producer, Viewer, Editor), compatibility rules, signature location
-- [ ] M1.3 `conformance/` with ≥ 15 valid fixtures, ≥ 25 invalid fixtures with error codes, and hostile fixtures (port `prototypes/flex/make_hostile.py`), plus `expected.json`
-- [ ] M1.4 `@flexova/core`: `write()` (deterministic), `read()`, `validate()` (coded errors, limits), `compileTokens()`, OPF and nav generation
-- [ ] M1.5 `python/flexova`: `write()` and `validate()` (port `prototypes/flex/flex_min.py`), passing the same suite
-- [ ] M1.6 CI `conformance.yml`: epubcheck and Ace by DAISY on valid fixtures; settle whether a `META-INF/` extra file is allowed (ADR-0003)
-- Done when TS and Python agree on every fixture, epubcheck reports 0 errors, Ace reports 0 violations, and builds are byte-identical.
+- [x] M1.1 `spec/profile/profile-1.0.json`, `spec/errors.json` (59 codes), `spec/schema/manifest.schema.json`
+- [x] M1.2 `spec/flexova-1.0.md`, the normative prose (draft 0.1)
+- [x] M1.3 `conformance/`: 122 fixtures (24 valid, 71 invalid, 27 hostile), every code exercised; deterministic stdlib generator with `--check`; golden `compileTokens` vectors
+- [x] M1.4 `@flexova/core`: `validate()`, `write()` (deterministic), `compileTokens()`; runs in browsers (pure-JS SHA-256 fallback)
+- [x] M1.5 `python/flexova`: the same API, standard library only
+- [x] M1.6 CI `conformance.yml`: fixture freshness, epubcheck 5.2.1, Ace 1.4.6 (Ace verified locally: 0 violations)
+- [ ] epubcheck green in CI (it could not run in the build session; first run happens when the branch is pushed)
+- Done when: TS and Python agree on every fixture ✅, Ace reports 0 violations ✅, builds are byte-identical ✅, epubcheck reports 0 errors (pending CI).
 
 ### M2: Viewer + single-file HTML (M)
 
@@ -79,5 +80,5 @@ If GitHub rejects the push with "push declined due to email privacy restrictions
 
 ## Open questions
 
-- Does epubcheck accept `META-INF/flexova.json`? If not, use `OEBPS/flexova.json` (settle in M1.6).
+- Does epubcheck accept `META-INF/flexova.json`? The first CI run of `conformance.yml` answers it. If not, move it to `OEBPS/flexova.json` with a superseding ADR.
 - Namespace URI waits on the domain (owner action).

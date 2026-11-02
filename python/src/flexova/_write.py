@@ -71,7 +71,7 @@ def write(doc: dict) -> bytes:
     nav_title = doc.get("nav_title") or "Contents"
     files["nav.xhtml"] = _html(
         lang, direction, nav_title, "styles/flexova.css",
-        f'<nav epub:type="toc" id="toc"><h1 id="toc-title">{escape(nav_title)}</h1><ol>{toc}</ol></nav>',
+        f'<nav epub:type="toc" role="doc-toc" id="toc"><h1 id="toc-title">{escape(nav_title)}</h1><ol>{toc}</ol></nav>',
     )
     files["styles/flexova.css"] = compile_tokens(doc.get("tokens")).encode("utf-8")
 

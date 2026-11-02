@@ -186,7 +186,7 @@ class Pkg:
 
     def files(self):
         nav = self.nav_body if self.nav_body is not None else (
-            '<nav epub:type="toc" id="toc"><h1 id="toc-title">Contents</h1><ol>'
+            '<nav epub:type="toc" role="doc-toc" id="toc"><h1 id="toc-title">Contents</h1><ol>'
             + "".join(f'<li><a href="content/{n}">Part {i}</a></li>' for i, (n, _) in enumerate(self.chapters, 1))
             + "</ol></nav>"
         )
@@ -278,7 +278,7 @@ def _(): return body("<p>Hello, Flexova.</p>")
 
 @fixture("valid", "block-elements", [], "Every block element of the profile.")
 def _(): return body(
-    '<section id="s1" epub:type="chapter"><h1 id="h1">Blocks</h1><p>Paragraph.</p><h2 id="h2">Lists</h2>'
+    '<section id="s1" epub:type="chapter" role="doc-chapter"><h1 id="h1">Blocks</h1><p>Paragraph.</p><h2 id="h2">Lists</h2>'
     "<ul><li>One</li><li><p>Two</p><ul><li>Nested</li></ul></li></ul>"
     '<ol start="3" reversed="reversed"><li>Three</li></ol><dl><dt>Term</dt><dd>Definition</dd></dl>'
     '<blockquote><p>Quote.</p></blockquote><aside role="note" data-flexova-variant="tip"><p>Tip.</p></aside>'
