@@ -12,3 +12,4 @@ conformance/expected.json
 conformance/vectors/*.json
 python/src/flexova/_data
 packages/core/src/spec
+packages/viewer/src/allowlist.ts

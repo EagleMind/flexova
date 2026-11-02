@@ -1,0 +1,32 @@
+{
+  "name": "@flexova/html",
+  "version": "0.0.0",
+  "description": "Render Flexova (.flexova) documents as static, self-contained .flexova.html pages that need no JavaScript and no network.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "flexova",
+    "html",
+    "static",
+    "offline",
+    "accessibility"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --target es2022",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@flexova/core": "workspace:*",
+    "@flexova/viewer": "workspace:*"
+  }
+}

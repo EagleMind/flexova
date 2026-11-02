@@ -64,6 +64,8 @@ export interface Item {
 
 export interface Package {
   opfPath: string;
+  title: string;
+  language: string;
   items: Item[]; // document order
   byPath: Map<string, Item>;
   navPath: string | null;
@@ -92,7 +94,7 @@ function parsePrefix(value: string): Record<string, string> {
 }
 
 // --- phase 2: package -------------------------------------------------------------------------
-function checkPackage(entries: Map<string, Uint8Array>, c: Collector): Package | null {
+export function checkPackage(entries: Map<string, Uint8Array>, c: Collector): Package | null {
   const containerPath = "META-INF/container.xml";
   const container = entries.get(containerPath);
   if (!container) {
@@ -198,6 +200,11 @@ function checkPackage(entries: Map<string, Uint8Array>, c: Collector): Package |
   }
   const pkg: Package = {
     opfPath,
+    title:
+      children(metadata, DC_NS, "title")
+        .map((e) => xmlTrim(e.text()))
+        .find(Boolean) ?? "",
+    language: langs[0] ?? "",
     items,
     byPath: new Map(items.map((i) => [i.path, i])),
     navPath: null,
@@ -382,7 +389,11 @@ function checkResources(entries: Map<string, Uint8Array>, pkg: Package, c: Colle
 
 /** Validate a .flexova package. Never throws for malformed input; problems are reported as issues. */
 export async function validate(input: Uint8Array | ArrayBuffer): Promise<Report> {
-  const data = input instanceof Uint8Array ? input : new Uint8Array(input);
+  // A plain Uint8Array view (not a Node Buffer), so every entry handed out is a plain Uint8Array too.
+  const data =
+    input instanceof Uint8Array
+      ? new Uint8Array(input.buffer, input.byteOffset, input.byteLength)
+      : new Uint8Array(input);
   const c = new Collector();
   const entries = readZip(data, c);
   if (!entries) return c.report();

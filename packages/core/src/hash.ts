@@ -76,3 +76,11 @@ export async function sha256Hex(data: Uint8Array): Promise<string> {
     return toHex(new Uint8Array(await subtle.digest("SHA-256", data as Uint8Array<ArrayBuffer>)));
   return toHex(sha256Sync(data));
 }
+
+/** SHA-256 digest of `data`, using WebCrypto when available and the pure-JS fallback otherwise. */
+export async function sha256(data: Uint8Array): Promise<Uint8Array> {
+  const subtle = globalThis.crypto?.subtle;
+  if (subtle)
+    return new Uint8Array(await subtle.digest("SHA-256", data as Uint8Array<ArrayBuffer>));
+  return sha256Sync(data);
+}

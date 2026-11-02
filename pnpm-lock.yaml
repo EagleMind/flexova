@@ -48,6 +48,21 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
 
+  packages/html:
+    dependencies:
+      '@flexova/core':
+        specifier: workspace:*
+        version: link:../core
+      '@flexova/viewer':
+        specifier: workspace:*
+        version: link:../viewer
+
+  packages/viewer:
+    devDependencies:
+      '@flexova/core':
+        specifier: workspace:*
+        version: link:../core
+
 packages:
 
   '@cacheable/memory@2.2.0':

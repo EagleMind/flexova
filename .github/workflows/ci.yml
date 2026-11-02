@@ -26,9 +26,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
+      # Packages consume each other's built output, so build (in dependency order) before typecheck and tests.
+      - run: pnpm build
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm build
+      - run: pnpm --filter @flexova/viewer size
 
   python:
     name: Python (stdlib only)

@@ -1,0 +1,41 @@
+{
+  "name": "@flexova/viewer",
+  "version": "0.0.0",
+  "description": "<flexova-viewer>: a dependency-free web component that displays Flexova (.flexova) documents safely, offline, in any framework.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/flexova-viewer.min.js"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./render": {
+      "types": "./dist/render.d.ts",
+      "import": "./dist/render.js"
+    },
+    "./flexova-viewer.min.js": "./dist/flexova-viewer.min.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "flexova",
+    "web-component",
+    "document-viewer",
+    "reflowable",
+    "accessibility"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit -p .",
+    "gen": "node scripts/gen-allowlist.mjs",
+    "size": "node scripts/size.mjs"
+  },
+  "devDependencies": {
+    "@flexova/core": "workspace:*"
+  }
+}
