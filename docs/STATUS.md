@@ -1,13 +1,13 @@
 # Status
 
-**Current milestone:** M4, FlexPad web reader (in review: `m4-reader` in `EagleMind/flexpad`, and the hooks it needed on `m4-reader-hooks` here)
-**Next task:** M5.1, the FlexPad editor (in the flexpad repo). Here: the first 0.1.0 release once the owner's npm/PyPI setup is done.
+**Current milestone:** M5, FlexPad editor (in review: `m5-editor` in `EagleMind/flexpad`, and the hooks it needed on `m5-editor-hooks` here)
+**Next task:** M6, the pilot release: the docs site for the spec and guides, and the first 0.1.0 release once the owner's npm/PyPI setup is done.
 
 ## Owner actions (only the project owner can do these)
 
 - [x] Create the public GitHub repo `EagleMind/flexova` and give the Claude GitHub App access to it (done 2026-11-02; all milestone branches pushed)
 - [x] Create the repo `EagleMind/flexpad` (public, AGPL-3.0 per ADR-0016) and give the Claude GitHub App access to it
-- [ ] Open one PR per milestone branch, each targeting the previous one (`m0-bootstrap` → `main`, `m1-spec` → `m0-bootstrap`, `m2-viewer` → `m1-spec`, `m3-cli` → `m2-viewer`, `m4-reader-hooks` → `m3-cli`), or ask a Claude session to open them
+- [ ] Open one PR per milestone branch, each targeting the previous one (`m0-bootstrap` → `main`, `m1-spec` → `m0-bootstrap`, `m2-viewer` → `m1-spec`, `m3-cli` → `m2-viewer`, `m4-reader-hooks` → `m3-cli`, `m5-editor-hooks` → `m4-reader-hooks`), or ask a Claude session to open them
 - [ ] Trademark search: FLEXOVA and FLEXPAD in USPTO, EUIPO and WIPO Global Brand Database, classes 9 and 42 (ask the attorney to compare against "Flexera")
 - [ ] Register a domain (flexova.com/.dev/.org), then replace the `namespaceUri` placeholder in `spec/constants.json`
 - [ ] Create the npm org `@flexova` and a PyPI account
@@ -78,7 +78,10 @@ Size: S ≈ 1 session, M ≈ 2–3, L ≈ 4+. Each milestone ends with a PR.
 
 ### M4–M6: FlexPad (public repo, AGPL-3.0)
 
-M4 (the web reader) is built and in review in the `EagleMind/flexpad` repo, which tracks its own status. Hooks it needed from this repo are on branch `m4-reader-hooks`: `read()` metadata, the viewer's `--flexova-font-scale`, and print rendering.
+M4 (the web reader) and M5 (the editor) are built and in review in the `EagleMind/flexpad` repo, which tracks its own status. Hooks they needed from this repo:
+
+- `m4-reader-hooks`: `read()` metadata, the viewer's `--flexova-font-scale`, and print rendering.
+- `m5-editor-hooks`: core exports `PROFILE` (the editor's schema is generated from it), `defaultColors()` and `CONTRAST_RULE` (the theme editor's live contrast check).
 
 Web reader (M4), editor (M5), pilot release (M6).
 
@@ -115,4 +118,4 @@ If GitHub rejects the push with "push declined due to email privacy restrictions
 ## Open questions
 
 - Namespace URI waits on the domain (owner action).
-- TeX math from Pandoc sources stays TeX (shown as code) until a TeX→MathML step is added. Decide whether M5's editor needs it.
+- TeX math from Pandoc sources stays TeX (shown as code) until a TeX→MathML step is added. FlexPad's editor (M5) keeps MathML unchanged and doesn't edit formulas, so it doesn't need one; revisit if pilots ask for formula editing.
